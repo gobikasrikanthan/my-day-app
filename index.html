@@ -5,13 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>My Day</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1a1f2e">
+<meta name="theme-color" content="#2c5f4a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="My Day">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f8f7f4;--surface:#ffffff;--surface2:#f1f0ec;--border:#e5e3db;--text:#1a1a16;--soft:#8a8880;--accent:#2c5f4a;--accent-l:#e6f0ec;--warn:#c84b1f;--warn-l:#fdf0eb;--gold:#b08a3e;--gold-l:#faf4e6;--blue:#2a4a7f;--blue-l:#eaeff8;--r:14px;--nav-h:56px;}
+:root{
+  --bg:#f8f7f4;--surface:#fff;--surface2:#f1f0ec;--border:#e5e3db;
+  --text:#1a1a16;--soft:#8a8880;
+  --accent:#2c5f4a;--accent-l:#e6f0ec;
+  --warn:#c84b1f;--warn-l:#fdf0eb;
+  --gold:#b08a3e;--gold-l:#faf4e6;
+  --blue:#2a4a7f;--blue-l:#eaeff8;
+  --purple:#6b3fa0;--purple-l:#f3eeff;
+  --dump:#5a3e28;--dump-l:#f5ede6;
+  --recur:#1a6a6e;--recur-l:#e6f5f5;
+  --r:14px;--nav-h:56px;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
@@ -22,104 +33,121 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .app-name{font-family:'Instrument Serif',serif;font-size:1.5rem;letter-spacing:-.01em;}
 .top-date{font-size:.75rem;color:var(--soft);font-weight:500;}
-.day-bar-wrap{display:flex;align-items:center;gap:10px;}
+.bar-wrap{display:flex;align-items:center;gap:10px;}
 .bar-bg{flex:1;height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;}
 .bar-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
 .bar-txt{font-size:.72rem;color:var(--soft);font-weight:600;white-space:nowrap;}
 
 /* NAV */
 .nav{display:flex;background:var(--surface);border-top:1px solid var(--border);height:var(--nav-h);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--soft);font-size:.6rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:color .2s;padding:6px 0;}
-.nav-btn .ni{font-size:1.1rem;transition:transform .2s;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--soft);font-size:.58rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:color .2s;padding:5px 0;}
+.nav-btn .ni{font-size:1.05rem;transition:transform .2s;}
 .nav-btn.active{color:var(--accent);}
 .nav-btn.active .ni{transform:scale(1.15);}
 
 /* PAGES */
 .pages{flex:1;overflow:hidden;position:relative;}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:16px 16px 90px;display:none;-webkit-overflow-scrolling:touch;}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:14px 15px 90px;display:none;-webkit-overflow-scrolling:touch;}
 .page.active{display:block;}
 
-/* SECTIONS */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:18px 0 8px;cursor:pointer;user-select:none;}
-.sec-left{display:flex;align-items:center;gap:8px;}
-.sec-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
-.badge{background:var(--surface2);color:var(--soft);border-radius:99px;padding:1px 8px;font-size:.68rem;font-weight:700;}
+/* SECTION */
+.sec-wrap{margin-bottom:18px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;cursor:pointer;user-select:none;padding:2px 0;}
+.sec-left{display:flex;align-items:center;gap:7px;}
+.sec-title{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
+.badge{background:var(--surface2);color:var(--soft);border-radius:99px;padding:1px 8px;font-size:.67rem;font-weight:700;}
 .badge.lit{background:var(--accent-l);color:var(--accent);}
 .caret{font-size:.6rem;color:var(--soft);transition:transform .2s;}
-.collapsed>.sec-body{display:none;}
-.collapsed .caret{transform:rotate(-90deg);}
+.sec-wrap.collapsed .sec-body{display:none;}
+.sec-wrap.collapsed .caret{transform:rotate(-90deg);}
 
 /* TASK CARDS */
 .card-list{display:flex;flex-direction:column;gap:2px;}
-.task-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:flex-start;gap:11px;padding:12px 13px;transition:background .15s;}
+.task-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:flex-start;gap:11px;padding:11px 12px;transition:background .15s;}
 .task-card:hover{background:#fafaf8;}
-.task-card.dim{opacity:.5;}
-.chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;background:var(--surface);}
+.task-card.dim{opacity:.48;}
+.chk{width:21px;height:21px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;background:var(--surface);}
 .chk:hover{border-color:var(--accent);}
 .chk.on{background:var(--accent);border-color:var(--accent);}
-.chk.on::after{content:'✓';color:#fff;font-size:.65rem;font-weight:700;}
+.chk.on::after{content:'✓';color:#fff;font-size:.62rem;font-weight:700;}
 .t-body{flex:1;min-width:0;}
-.t-name{font-size:.88rem;line-height:1.35;color:var(--text);}
+.t-name{font-size:.87rem;line-height:1.35;color:var(--text);}
 .t-name.done{text-decoration:line-through;color:var(--soft);}
-.t-notes{font-size:.75rem;color:var(--soft);margin-top:3px;line-height:1.4;}
-.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-.chip{font-size:.63rem;font-weight:600;padding:2px 7px;border-radius:99px;letter-spacing:.02em;}
+.t-notes{font-size:.73rem;color:var(--soft);margin-top:3px;line-height:1.4;}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.chip{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:99px;}
 .c-area{background:var(--accent-l);color:var(--accent);}
 .c-cat{background:var(--surface2);color:var(--soft);}
 .c-hi{background:var(--warn-l);color:var(--warn);}
 .c-med{background:var(--gold-l);color:var(--gold);}
 .c-lo{background:var(--accent-l);color:var(--accent);}
-.c-dl{background:#f3eeff;color:#6b3fa0;}
-.c-rem{background:#e8f4f8;color:#1a6a8a;}
+.c-dl{background:var(--purple-l);color:var(--purple);}
+.c-rem{background:var(--blue-l);color:var(--blue);}
+.c-recur{background:var(--recur-l);color:var(--recur);}
+.c-dump{background:var(--dump-l);color:var(--dump);}
 .t-actions{display:flex;flex-direction:column;gap:2px;align-items:flex-end;flex-shrink:0;}
-.ib{background:none;border:none;cursor:pointer;color:#ccc;font-size:.85rem;padding:3px 4px;transition:color .2s;line-height:1;}
+.ib{background:none;border:none;cursor:pointer;color:#ccc;font-size:.82rem;padding:3px 4px;transition:color .2s;line-height:1;}
 .ib:hover{color:var(--soft);}
 .ib.danger:hover{color:var(--warn);}
+.ib.green:hover{color:var(--accent);}
+
+/* DUMP CARD */
+.dump-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:flex-start;gap:11px;padding:11px 12px;}
+.dump-card:hover{background:#fafaf8;}
 
 /* AREAS */
 .area-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.area-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden;}
+.area-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:13px;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden;}
 .area-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,var(--accent));}
-.area-emoji{font-size:1.4rem;margin-bottom:5px;}
-.area-name{font-size:.85rem;font-weight:600;margin-bottom:3px;}
-.area-stats{font-size:.7rem;color:var(--soft);}
-.area-bar-bg{height:3px;background:var(--surface2);border-radius:99px;margin-top:8px;overflow:hidden;}
+.area-emoji{font-size:1.3rem;margin-bottom:4px;}
+.area-name{font-size:.83rem;font-weight:600;margin-bottom:3px;}
+.area-stats{font-size:.69rem;color:var(--soft);}
+.area-bar-bg{height:3px;background:var(--surface2);border-radius:99px;margin-top:7px;overflow:hidden;}
 .area-bar-fill{height:100%;border-radius:99px;background:var(--ac,var(--accent));transition:width .4s;}
-.add-area-card{background:none;border:2px dashed var(--border);border-radius:var(--r);padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.82rem;color:var(--soft);font-family:'DM Sans',sans-serif;font-weight:500;width:100%;transition:all .2s;grid-column:span 2;}
+.add-area-card{background:none;border:2px dashed var(--border);border-radius:var(--r);padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.8rem;color:var(--soft);font-family:'DM Sans',sans-serif;font-weight:500;width:100%;transition:all .2s;grid-column:span 2;}
 .add-area-card:hover{border-color:var(--soft);}
 
 /* PROJECTS */
 .proj-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:10px;}
-.proj-hdr{padding:14px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.proj-title{font-size:.95rem;font-weight:600;display:flex;align-items:center;gap:7px;margin-bottom:3px;}
-.proj-meta{font-size:.72rem;color:var(--soft);}
-.proj-prog{padding:0 16px 12px;}
-.proj-bar-bg{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:5px;}
+.proj-hdr{padding:13px 15px 9px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.proj-title{font-size:.93rem;font-weight:600;display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+.proj-meta{font-size:.7rem;color:var(--soft);}
+.proj-prog{padding:0 15px 11px;}
+.proj-bar-bg{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:4px;}
 .proj-bar-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s;}
-.proj-prog-txt{font-size:.68rem;color:var(--soft);font-weight:600;}
+.proj-prog-txt{font-size:.67rem;color:var(--soft);font-weight:600;}
 .st-list{border-top:1px solid var(--border);}
-.st-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);transition:background .15s;}
+.st-row{display:flex;align-items:center;gap:10px;padding:9px 15px;border-bottom:1px solid var(--border);transition:background .15s;}
 .st-row:last-child{border-bottom:none;}
 .st-row:hover{background:var(--bg);}
-.sq{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;background:var(--surface);}
+.sq{width:15px;height:15px;border-radius:4px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;background:var(--surface);}
 .sq:hover{border-color:var(--accent);}
 .sq.on{background:var(--accent);border-color:var(--accent);}
-.sq.on::after{content:'✓';color:#fff;font-size:.55rem;font-weight:700;}
-.st-name{flex:1;font-size:.83rem;}
+.sq.on::after{content:'✓';color:#fff;font-size:.52rem;font-weight:700;}
+.st-name{flex:1;font-size:.82rem;}
 .st-name.done{text-decoration:line-through;color:var(--soft);}
-.st-add{display:flex;gap:8px;padding:10px 16px;background:var(--bg);}
-.st-inp{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.82rem;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none;}
+.st-add{display:flex;gap:8px;padding:9px 15px;background:var(--bg);}
+.st-inp{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.81rem;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none;}
 .st-inp:focus{border-color:var(--accent);}
-.st-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
+.st-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:.77rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
+
+/* RECURRING */
+.recur-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:flex-start;gap:11px;padding:11px 12px;margin-bottom:2px;}
+.recur-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+/* PAGE HEADERS */
+.page-hdr{margin-bottom:16px;}
+.page-hdr-title{font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:4px;}
+.page-hdr-sub{font-size:.76rem;color:var(--soft);}
 
 /* EMPTY */
-.empty{text-align:center;padding:40px 20px;color:var(--soft);}
+.empty{text-align:center;padding:36px 16px;color:var(--soft);}
 .empty-ico{font-size:2rem;margin-bottom:10px;}
-.empty p{font-size:.85rem;line-height:1.6;}
+.empty p{font-size:.83rem;line-height:1.6;}
 
 /* FAB */
-.fab-wrap{position:fixed;bottom:calc(var(--nav-h) + 14px + env(safe-area-inset-bottom));right:18px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:200;}
-.fab{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.25rem;box-shadow:0 4px 18px rgba(0,0,0,.14);transition:transform .2s;}
+.fab-wrap{position:fixed;bottom:calc(var(--nav-h) + 14px + env(safe-area-inset-bottom));right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:9px;z-index:200;}
+.fab{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 18px rgba(0,0,0,.14);transition:transform .2s;}
 .fab:hover{transform:scale(1.08);}
 .fab-main{background:var(--accent);color:#fff;}
 .fab-voice{background:#fff;color:var(--accent);border:2px solid var(--accent);}
@@ -129,60 +157,87 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 /* MODALS */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:500;align-items:flex-end;justify-content:center;}
 .overlay.open{display:flex;}
-.modal{background:var(--surface);border-radius:22px 22px 0 0;padding:22px 20px calc(28px + env(safe-area-inset-bottom));width:100%;max-width:640px;animation:mup .28s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;}
+.modal{background:var(--surface);border-radius:22px 22px 0 0;padding:20px 18px calc(26px + env(safe-area-inset-bottom));width:100%;max-width:640px;animation:mup .27s cubic-bezier(.4,0,.2,1);max-height:93vh;overflow-y:auto;}
 @keyframes mup{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.modal-title{font-family:'Instrument Serif',serif;font-size:1.2rem;}
-.mx{background:var(--surface2);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:.9rem;color:var(--soft);}
-.fg{margin-bottom:14px;}
-.fl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);margin-bottom:6px;display:block;}
-.fi,.fs{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.modal-title{font-family:'Instrument Serif',serif;font-size:1.18rem;}
+.mx{background:var(--surface2);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:.88rem;color:var(--soft);}
+.fg{margin-bottom:13px;}
+.fl{font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);margin-bottom:5px;display:block;}
+.fi,.fs{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.87rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;}
 .fi:focus,.fs:focus{border-color:var(--accent);}
-textarea.fi{resize:vertical;min-height:65px;}
+textarea.fi{resize:vertical;min-height:60px;}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.prow,.drow{display:flex;gap:7px;}
-.pbtn,.dbtn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:.74rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;color:var(--soft);text-align:center;}
+.prow,.drow,.frow{display:flex;gap:6px;}
+.pbtn,.dbtn,.fbtn{flex:1;padding:8px 3px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:.72rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;color:var(--soft);text-align:center;}
 .pbtn.sh{background:var(--warn-l);border-color:var(--warn);color:var(--warn);}
 .pbtn.sm{background:var(--gold-l);border-color:var(--gold);color:var(--gold);}
 .pbtn.sl{background:var(--accent-l);border-color:var(--accent);color:var(--accent);}
-.dbtn.sel{background:var(--surface2);border-color:var(--soft);color:var(--text);}
-.btn-p{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:11px;font-size:.92rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:6px;}
+.dbtn.sel,.fbtn.sel{background:var(--surface2);border-color:var(--soft);color:var(--text);}
+.days-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.day-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;color:var(--soft);display:flex;align-items:center;justify-content:center;}
+.day-btn.sel{background:var(--recur-l);border-color:var(--recur);color:var(--recur);}
+.btn-p{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:11px;font-size:.9rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:5px;}
+.btn-p.dump-btn{background:var(--dump);}
+.btn-p.recur-btn{background:var(--recur);}
 
 /* VOICE */
-.vstatus{display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:12px;align-items:center;gap:10px;font-size:.82rem;color:var(--soft);}
+.vstatus{display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 15px;margin-bottom:11px;align-items:center;gap:10px;font-size:.81rem;color:var(--soft);}
 .vstatus.on{display:flex;}
 .vdot{width:8px;height:8px;border-radius:50%;background:#e74c3c;animation:vb 1s infinite;flex-shrink:0;}
 @keyframes vb{0%,100%{opacity:1}50%{opacity:.2}}
-.ai-msg{font-size:.78rem;color:var(--soft);text-align:center;padding:8px;display:none;}
+.ai-msg{font-size:.77rem;color:var(--soft);text-align:center;padding:7px;display:none;}
 .ai-msg.on{display:block;}
 
 /* FILTER */
-.filter-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:14px;}
+.filter-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:13px;}
 .filter-row::-webkit-scrollbar{display:none;}
-.fchip{white-space:nowrap;padding:5px 13px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:.76rem;font-weight:600;color:var(--soft);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.fchip{white-space:nowrap;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:.74rem;font-weight:600;color:var(--soft);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
 .fchip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 
-/* NOTIF BANNER */
-.nb{background:var(--blue-l);border:1px solid #c5d5ee;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--blue);}
-.nb button{margin-left:auto;background:var(--blue);color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:.74rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;white-space:nowrap;}
+/* MORNING MODAL (full screen) */
+.morning-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;align-items:center;justify-content:center;padding:20px;}
+.morning-overlay.open{display:flex;}
+.morning-modal{background:var(--surface);border-radius:20px;padding:24px 20px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;}
+.morning-title{font-family:'Instrument Serif',serif;font-size:1.4rem;margin-bottom:6px;}
+.morning-sub{font-size:.8rem;color:var(--soft);margin-bottom:18px;}
+.morning-item{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);}
+.morning-item:last-child{border-bottom:none;}
+.morning-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .2s;background:var(--surface);}
+.morning-check.on{background:var(--accent);border-color:var(--accent);}
+.morning-check.on::after{content:'✓';color:#fff;font-size:.62rem;font-weight:700;}
+.morning-item-body{flex:1;}
+.morning-item-name{font-size:.87rem;font-weight:500;}
+.morning-item-meta{font-size:.7rem;color:var(--soft);margin-top:3px;}
+.morning-actions{display:flex;gap:10px;margin-top:18px;}
+.morning-actions .btn-p{margin-top:0;}
+.btn-ghost{flex:1;padding:13px;background:none;color:var(--soft);border:1.5px solid var(--border);border-radius:11px;font-size:.88rem;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;}
 
-/* EMOJI / COLOR PICKERS */
-.epicker{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
-.ep{font-size:1.25rem;cursor:pointer;padding:5px;border-radius:8px;border:2px solid transparent;transition:all .15s;}
+/* NOTIF BANNER */
+.nb{background:var(--blue-l);border:1px solid #c5d5ee;border-radius:var(--r);padding:11px 13px;margin-bottom:12px;display:flex;align-items:center;gap:9px;font-size:.77rem;color:var(--blue);}
+.nb button{margin-left:auto;background:var(--blue);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:.73rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;white-space:nowrap;}
+
+/* EMOJI / COLOR */
+.epicker{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+.ep{font-size:1.2rem;cursor:pointer;padding:5px;border-radius:8px;border:2px solid transparent;transition:all .15s;}
 .ep.sel{border-color:var(--accent);background:var(--accent-l);}
-.cpicker{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
-.cp{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;}
+.cpicker{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;}
+.cp{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;}
 .cp.sel{border-color:var(--text);transform:scale(1.15);}
 
 /* SETTINGS */
-.srow{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
 .srow:last-child{border-bottom:none;}
-.slabel{font-size:.88rem;font-weight:500;}
-.ssub{font-size:.74rem;color:var(--soft);margin-top:2px;}
+.slabel{font-size:.87rem;font-weight:500;}
+.ssub{font-size:.73rem;color:var(--soft);margin-top:2px;}
 .toggle{width:44px;height:26px;border-radius:99px;background:var(--border);border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0;}
 .toggle.on{background:var(--accent);}
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
 .toggle.on::after{transform:translateX(18px);}
+
+/* SEND TO TODAY BTN */
+.to-today-btn{background:var(--accent-l);color:var(--accent);border:1px solid var(--accent);border-radius:7px;padding:3px 8px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;}
+.to-today-btn:hover{background:var(--accent);color:#fff;}
 </style>
 </head>
 <body>
@@ -190,7 +245,7 @@ textarea.fi{resize:vertical;min-height:65px;}
 
   <div class="top-bar">
     <div class="top-row"><span class="app-name">My Day</span><span class="top-date" id="topDate"></span></div>
-    <div class="day-bar-wrap">
+    <div class="bar-wrap">
       <div class="bar-bg"><div class="bar-fill" id="dayFill"></div></div>
       <span class="bar-txt" id="dayTxt">0 / 0</span>
     </div>
@@ -207,13 +262,32 @@ textarea.fi{resize:vertical;min-height:65px;}
       <div id="todaySecs"></div>
     </div>
 
+    <!-- BRAIN DUMP -->
+    <div class="page" id="page-dump">
+      <div class="page-hdr">
+        <div class="page-hdr-title">🧠 Brain Dump</div>
+        <div class="page-hdr-sub">Everything on your mind — move to Today when ready</div>
+      </div>
+      <div class="filter-row" id="dumpFilterRow"></div>
+      <div id="dumpSecs"></div>
+    </div>
+
+    <!-- RECURRING -->
+    <div class="page" id="page-recur">
+      <div class="page-hdr">
+        <div class="page-hdr-title">🔁 Recurring Tasks</div>
+        <div class="page-hdr-sub">These auto-appear in Today on their scheduled days</div>
+      </div>
+      <div id="recurList"></div>
+    </div>
+
     <!-- AREAS -->
     <div class="page" id="page-areas">
       <div class="area-grid" id="areaGrid"></div>
       <div id="areaDetail" style="display:none">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-          <button onclick="closeAreaDetail()" style="background:var(--surface2);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--soft);">← Back</button>
-          <span id="aDetailTitle" style="font-family:'Instrument Serif',serif;font-size:1.2rem;"></span>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button onclick="closeAreaDetail()" style="background:var(--surface2);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--soft);">← Back</button>
+          <span id="aDetailTitle" style="font-family:'Instrument Serif',serif;font-size:1.15rem;"></span>
         </div>
         <div id="aDetailBody"></div>
       </div>
@@ -224,37 +298,64 @@ textarea.fi{resize:vertical;min-height:65px;}
       <div id="projList"></div>
     </div>
 
-    <!-- SETTINGS -->
-    <div class="page" id="page-settings">
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:18px;">Settings</div>
+    <!-- MORE (Recur + Settings) -->
+    <div class="page" id="page-more">
+      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:18px;">More</div>
       <div class="srow">
-        <div><div class="slabel">Notifications</div><div class="ssub">Reminders for your tasks</div></div>
+        <div><div class="slabel">🔁 Recurring Tasks</div><div class="ssub">Set up tasks that repeat automatically</div></div>
+        <button onclick="switchPage('recur')" style="background:var(--recur-l);border:1px solid var(--recur);border-radius:8px;padding:6px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--recur);font-weight:600;">Manage →</button>
+      </div>
+      <div class="srow">
+        <div><div class="slabel">🗂️ Areas of Life</div><div class="ssub">Add or edit your life areas</div></div>
+        <button onclick="switchPage('areas')" style="background:var(--surface2);border:none;border-radius:8px;padding:6px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--soft);">Manage →</button>
+      </div>
+      <div class="srow">
+        <div><div class="slabel">🔔 Notifications</div><div class="ssub">Reminders for your tasks</div></div>
         <button class="toggle" id="notifToggle" onclick="toggleNotif()"></button>
       </div>
       <div class="srow">
-        <div><div class="slabel">Manage Areas</div><div class="ssub">Edit your areas of life</div></div>
-        <button onclick="switchPage('areas')" style="background:var(--surface2);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--soft);">Go →</button>
+        <div><div class="slabel">☀️ Morning Planning</div><div class="ssub">Trigger morning check-in manually</div></div>
+        <button onclick="openMorningModal(true)" style="background:var(--gold-l);border:1px solid var(--gold);border-radius:8px;padding:6px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--gold);font-weight:600;">Open →</button>
       </div>
       <div class="srow">
-        <div><div class="slabel">Clear all tasks</div><div class="ssub">Keeps areas and projects</div></div>
-        <button onclick="clearTasks()" style="background:var(--warn-l);border:1px solid var(--warn);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--warn);font-weight:600;">Clear</button>
+        <div><div class="slabel">🌙 End of Day</div><div class="ssub">Move unfinished tasks back to Brain Dump</div></div>
+        <button onclick="endOfDay()" style="background:var(--dump-l);border:1px solid var(--dump);border-radius:8px;padding:6px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--dump);font-weight:600;">Run →</button>
       </div>
-      <div style="margin-top:28px;font-size:.74rem;color:var(--soft);text-align:center;line-height:1.7;">My Day · All data saved on this device only</div>
+      <div class="srow">
+        <div><div class="slabel">🗑 Clear Today's Tasks</div><div class="ssub">Keeps Brain Dump, areas and projects</div></div>
+        <button onclick="clearToday()" style="background:var(--warn-l);border:1px solid var(--warn);border-radius:8px;padding:6px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--warn);font-weight:600;">Clear</button>
+      </div>
+      <div style="margin-top:24px;font-size:.73rem;color:var(--soft);text-align:center;line-height:1.7;">My Day · All data saved on this device only</div>
     </div>
 
-  </div>
+  </div><!-- /pages -->
 
   <nav class="nav">
     <button class="nav-btn active" id="nb-today"    onclick="switchPage('today')">   <span class="ni">☀️</span>Today</button>
+    <button class="nav-btn"        id="nb-dump"     onclick="switchPage('dump')">    <span class="ni">🧠</span>Dump</button>
     <button class="nav-btn"        id="nb-areas"    onclick="switchPage('areas')">   <span class="ni">🗂️</span>Areas</button>
     <button class="nav-btn"        id="nb-projects" onclick="switchPage('projects')"><span class="ni">📁</span>Projects</button>
-    <button class="nav-btn"        id="nb-settings" onclick="switchPage('settings')"><span class="ni">⚙️</span>Settings</button>
+    <button class="nav-btn"        id="nb-more"     onclick="switchPage('more')">    <span class="ni">⚙️</span>More</button>
   </nav>
 </div>
 
+<!-- FAB -->
 <div class="fab-wrap" id="fabWrap">
   <button class="fab fab-voice" id="voiceBtn">🎙️</button>
   <button class="fab fab-main"  id="fabMain">＋</button>
+</div>
+
+<!-- MORNING MODAL -->
+<div class="morning-overlay" id="morningOverlay">
+  <div class="morning-modal">
+    <div class="morning-title">☀️ Good morning!</div>
+    <div class="morning-sub">Pick what you want to work on today from your Brain Dump.</div>
+    <div id="morningItems"></div>
+    <div class="morning-actions">
+      <button class="btn-ghost" onclick="closeMorning()">Skip</button>
+      <button class="btn-p" onclick="confirmMorning()" style="flex:2">Move to Today</button>
+    </div>
+  </div>
 </div>
 
 <!-- TASK MODAL -->
@@ -277,7 +378,7 @@ textarea.fi{resize:vertical;min-height:65px;}
     <div class="fg"><label class="fl">Priority</label>
       <div class="prow">
         <button class="pbtn" data-p="high" onclick="selP('high')">🔴 High</button>
-        <button class="pbtn sm" data-p="med" onclick="selP('med')">🟡 Medium</button>
+        <button class="pbtn sm" data-p="med" onclick="selP('med')">🟡 Med</button>
         <button class="pbtn" data-p="low"  onclick="selP('low')">🟢 Low</button>
       </div>
     </div>
@@ -285,8 +386,93 @@ textarea.fi{resize:vertical;min-height:65px;}
       <div class="fg"><label class="fl">Deadline</label><input class="fi" id="tDeadline" type="datetime-local"></div>
       <div class="fg"><label class="fl">Reminder</label><input class="fi" id="tReminder" type="datetime-local"></div>
     </div>
+    <!-- Add to: Today or Brain Dump -->
+    <div class="fg"><label class="fl">Add to</label>
+      <div class="frow">
+        <button class="fbtn sel" data-loc="today" onclick="selLoc('today')">☀️ Today</button>
+        <button class="fbtn" data-loc="dump"  onclick="selLoc('dump')">🧠 Brain Dump</button>
+      </div>
+    </div>
     <input type="hidden" id="tEditId">
     <button class="btn-p" onclick="saveTask()">Save Task</button>
+  </div>
+</div>
+
+<!-- DUMP TASK MODAL (quick add) -->
+<div class="overlay" id="dumpModal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">🧠 Brain Dump</span><button class="mx" onclick="closeModal('dumpModal')">✕</button></div>
+    <div class="fg"><label class="fl">Task name</label><input class="fi" id="dName" placeholder="What's on your mind?"></div>
+    <div class="fg"><label class="fl">Notes (optional)</label><textarea class="fi" id="dNotes" placeholder="Any details…" rows="2"></textarea></div>
+    <div class="r2">
+      <div class="fg"><label class="fl">Area</label><select class="fs" id="dArea"></select></div>
+      <div class="fg"><label class="fl">Priority</label>
+        <select class="fs" id="dPri">
+          <option value="high">🔴 High</option>
+          <option value="med" selected>🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Duration</label>
+      <div class="drow">
+        <button class="dbtn" data-dd="15"  onclick="selDDur('15')">⚡ 15 min</button>
+        <button class="dbtn" data-dd="30"  onclick="selDDur('30')">🕐 30 min</button>
+        <button class="dbtn" data-dd="60+" onclick="selDDur('60+')">🕒 60+ min</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Deadline (optional)</label><input class="fi" id="dDeadline" type="datetime-local"></div>
+    <button class="btn-p dump-btn" onclick="saveDumpTask()">Add to Brain Dump</button>
+  </div>
+</div>
+
+<!-- RECURRING MODAL -->
+<div class="overlay" id="recurModal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">🔁 Recurring Task</span><button class="mx" onclick="closeModal('recurModal')">✕</button></div>
+    <div class="fg"><label class="fl">Task name</label><input class="fi" id="rName" placeholder="e.g. School run, Team standup"></div>
+    <div class="fg"><label class="fl">Notes (optional)</label><input class="fi" id="rNotes" placeholder="Any details…"></div>
+    <div class="r2">
+      <div class="fg"><label class="fl">Area</label><select class="fs" id="rArea"></select></div>
+      <div class="fg"><label class="fl">Category</label><select class="fs" id="rCat"></select></div>
+    </div>
+    <div class="fg"><label class="fl">Duration</label>
+      <div class="drow">
+        <button class="dbtn" data-rd="15"  onclick="selRDur('15')">⚡ 15 min</button>
+        <button class="dbtn" data-rd="30"  onclick="selRDur('30')">🕐 30 min</button>
+        <button class="dbtn" data-rd="60+" onclick="selRDur('60+')">🕒 60+ min</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Priority</label>
+      <div class="prow" id="rPriRow">
+        <button class="pbtn" data-rp="high" onclick="selRP('high')">🔴 High</button>
+        <button class="pbtn sm" data-rp="med" onclick="selRP('med')">🟡 Med</button>
+        <button class="pbtn" data-rp="low"  onclick="selRP('low')">🟢 Low</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Repeat frequency</label>
+      <div class="frow" style="flex-wrap:wrap;gap:6px;">
+        <button class="fbtn" data-fr="daily"      onclick="selFreq('daily')">Daily</button>
+        <button class="fbtn" data-fr="weekly"     onclick="selFreq('weekly')">Weekly</button>
+        <button class="fbtn" data-fr="fortnightly" onclick="selFreq('fortnightly')">Fortnightly</button>
+        <button class="fbtn" data-fr="monthly"    onclick="selFreq('monthly')">Monthly</button>
+        <button class="fbtn" data-fr="custom"     onclick="selFreq('custom')">Custom</button>
+      </div>
+    </div>
+    <div class="fg" id="customDaysGroup" style="display:none">
+      <label class="fl">Which days?</label>
+      <div class="days-row">
+        <button class="day-btn" data-day="0" onclick="toggleDay(0)">Su</button>
+        <button class="day-btn" data-day="1" onclick="toggleDay(1)">Mo</button>
+        <button class="day-btn" data-day="2" onclick="toggleDay(2)">Tu</button>
+        <button class="day-btn" data-day="3" onclick="toggleDay(3)">We</button>
+        <button class="day-btn" data-day="4" onclick="toggleDay(4)">Th</button>
+        <button class="day-btn" data-day="5" onclick="toggleDay(5)">Fr</button>
+        <button class="day-btn" data-day="6" onclick="toggleDay(6)">Sa</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Reminder time (optional)</label><input class="fi" id="rReminder" type="time"></div>
+    <button class="btn-p recur-btn" onclick="saveRecur()">Save Recurring Task</button>
   </div>
 </div>
 
@@ -316,45 +502,70 @@ textarea.fi{resize:vertical;min-height:65px;}
 <script>
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 const DEFAULT_AREAS=[
-  {id:'household',name:'Household',     emoji:'🏠',color:'#2c5f4a'},
-  {id:'business', name:'Business',      emoji:'💼',color:'#2a4a7f'},
+  {id:'household',name:'Household',      emoji:'🏠',color:'#2c5f4a'},
+  {id:'business', name:'Business',       emoji:'💼',color:'#2a4a7f'},
   {id:'health',   name:'Health & Fitness',emoji:'💪',color:'#c84b1f'},
-  {id:'personal', name:'Personal Growth',emoji:'🌱',color:'#6b3fa0'},
-  {id:'family',   name:'Family',        emoji:'❤️', color:'#b85c8a'},
-  {id:'finance',  name:'Finance',       emoji:'💰',color:'#b08a3e'},
+  {id:'personal', name:'Personal Growth', emoji:'🌱',color:'#6b3fa0'},
+  {id:'family',   name:'Family',          emoji:'❤️', color:'#b85c8a'},
+  {id:'finance',  name:'Finance',         emoji:'💰',color:'#b08a3e'},
 ];
 const CATS=['General','Admin','Errand','Cleaning','Cooking','Exercise','Meeting','Planning','Shopping','Other'];
 const EMOJIS=['📁','🏠','💼','🎯','🌱','✈️','🎨','🛒','💪','📚','🔧','🌟','🎉','🚀','❤️','🏋️','🍳','🧹','🧺','📦','💰','🎓','🌍','🤝'];
 const COLORS=['#2c5f4a','#2a4a7f','#c84b1f','#6b3fa0','#b85c8a','#b08a3e','#1a7a6e','#c0392b','#2980b9','#8e44ad'];
+const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const FREQ_LABELS={daily:'Daily',weekly:'Weekly',fortnightly:'Fortnightly',monthly:'Monthly',custom:'Custom days'};
 
 // ── STATE ────────────────────────────────────────────────────────────────────
-let areas    = JSON.parse(localStorage.getItem('md3_areas') || 'null') || DEFAULT_AREAS;
-let tasks    = JSON.parse(localStorage.getItem('md3_tasks') || '[]');
-let projects = JSON.parse(localStorage.getItem('md3_projects') || '[]');
-let notifOn  = localStorage.getItem('md3_notif') === 'true';
+let areas    = JSON.parse(localStorage.getItem('md4_areas')    || 'null') || DEFAULT_AREAS;
+let tasks    = JSON.parse(localStorage.getItem('md4_tasks')    || '[]');
+let dump     = JSON.parse(localStorage.getItem('md4_dump')     || '[]');
+let recurs   = JSON.parse(localStorage.getItem('md4_recurs')   || '[]');
+let projects = JSON.parse(localStorage.getItem('md4_projects') || '[]');
+let notifOn  = localStorage.getItem('md4_notif') === 'true';
+let lastOpen = localStorage.getItem('md4_lastOpen') || '';
 
-let selPri='med', selDuration='30', selEmoji='📁', selColor=COLORS[0], aSelEmoji='🏷️';
-let activeFilter='all', isRecording=false, recognition=null, currentPage='today', editId=null;
+let selPri='med', selDuration='30', selDDuration='30', selRDuration='30';
+let selRPri='med', selFrequency='daily', selCustomDays=[], selEmoji='📁';
+let selColor=COLORS[0], aSelEmoji='🏷️', taskLoc='today';
+let activeFilter='all', dumpFilter='all';
+let isRecording=false, recognition=null, currentPage='today', editId=null;
 
 // ── PERSIST ──────────────────────────────────────────────────────────────────
 function save(){
-  localStorage.setItem('md3_areas',    JSON.stringify(areas));
-  localStorage.setItem('md3_tasks',    JSON.stringify(tasks));
-  localStorage.setItem('md3_projects', JSON.stringify(projects));
-  localStorage.setItem('md3_notif',    notifOn);
+  localStorage.setItem('md4_areas',    JSON.stringify(areas));
+  localStorage.setItem('md4_tasks',    JSON.stringify(tasks));
+  localStorage.setItem('md4_dump',     JSON.stringify(dump));
+  localStorage.setItem('md4_recurs',   JSON.stringify(recurs));
+  localStorage.setItem('md4_projects', JSON.stringify(projects));
+  localStorage.setItem('md4_notif',    notifOn);
 }
 
 // ── UTILS ────────────────────────────────────────────────────────────────────
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
 const areaById=id=>areas.find(a=>a.id===id)||{name:'Other',emoji:'📌',color:'#888'};
 function todayStr(){return new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});}
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
 function fmtDL(dt){
-  if(!dt)return '';
+  if(!dt)return'';
   const d=new Date(dt),now=new Date(),diff=d-now;
-  if(diff<0)return '⚠️ Overdue';
-  if(diff<3600000)return `⏰ ${Math.round(diff/60000)}m`;
-  if(diff<86400000)return `⏰ ${Math.round(diff/3600000)}h`;
-  return `📅 ${d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}`;
+  if(diff<0)return'⚠️ Overdue';
+  if(diff<3600000)return`⏰ ${Math.round(diff/60000)}m`;
+  if(diff<86400000)return`⏰ ${Math.round(diff/3600000)}h`;
+  return`📅 ${d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}`;
+}
+function recurDueToday(r){
+  const now=new Date(),dow=now.getDay(),dom=now.getDate();
+  if(r.freq==='daily')return true;
+  if(r.freq==='weekly')return r.days?.includes(dow);
+  if(r.freq==='fortnightly'){
+    if(!r.days?.includes(dow))return false;
+    const start=r.startDate?new Date(r.startDate):new Date();
+    const weeksDiff=Math.floor((now-start)/(7*86400000));
+    return weeksDiff%2===0;
+  }
+  if(r.freq==='monthly')return r.days?.includes(dom)||dom===1;
+  if(r.freq==='custom')return r.days?.includes(dow);
+  return false;
 }
 
 // ── PAGE SWITCH ───────────────────────────────────────────────────────────────
@@ -364,18 +575,25 @@ function switchPage(p){
   document.getElementById('page-'+p)?.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('nb-'+p)?.classList.add('active');
-  const showFab=p==='today'||p==='projects';
-  document.getElementById('fabWrap').style.display=showFab?'flex':'none';
-  if(p==='projects'){document.getElementById('fabMain').textContent='📁';document.getElementById('voiceBtn').style.display='none';}
-  else{document.getElementById('fabMain').textContent='＋';document.getElementById('voiceBtn').style.display='flex';}
+  // fab logic
+  const noFab=['areas','more'];
+  document.getElementById('fabWrap').style.display=noFab.includes(p)?'none':'flex';
+  const vb=document.getElementById('voiceBtn');
+  const fm=document.getElementById('fabMain');
+  if(p==='projects'){fm.textContent='📁';vb.style.display='none';}
+  else if(p==='dump'){fm.textContent='＋';vb.style.display='none';}
+  else if(p==='recur'){fm.textContent='🔁';vb.style.display='none';}
+  else{fm.textContent='＋';vb.style.display='flex';}
   render();
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render(){
   document.getElementById('topDate').textContent=todayStr();
-  renderDayBar(); renderFilters(); renderToday(); renderAreas(); renderProjects();
-  renderNotifBanner(); document.getElementById('notifToggle').classList.toggle('on',notifOn||Notification.permission==='granted');
+  renderDayBar(); renderFilters(); renderToday();
+  renderDump(); renderRecur(); renderAreas(); renderProjects();
+  renderNotifBanner();
+  document.getElementById('notifToggle').classList.toggle('on',notifOn||Notification.permission==='granted');
 }
 
 function renderDayBar(){
@@ -391,28 +609,34 @@ function renderFilters(){
     const a=areaById(id);
     return`<button class="fchip ${activeFilter===id?'on':''}" onclick="setFilter('${id}')">${a.emoji} ${a.name}</button>`;
   }).join('');
+
+  // dump filters
+  const dids=['all',...new Set(dump.map(t=>t.areaId))];
+  document.getElementById('dumpFilterRow').innerHTML=dids.map(id=>{
+    if(id==='all')return`<button class="fchip ${dumpFilter==='all'?'on':''}" onclick="setDumpFilter('all')">✦ All</button>`;
+    const a=areaById(id);
+    return`<button class="fchip ${dumpFilter===id?'on':''}" onclick="setDumpFilter('${id}')">${a.emoji} ${a.name}</button>`;
+  }).join('');
 }
 
+// ── TODAY ─────────────────────────────────────────────────────────────────────
 function renderToday(){
   const cont=document.getElementById('todaySecs');
   let list=activeFilter==='all'?[...tasks]:tasks.filter(t=>t.areaId===activeFilter);
-  if(!list.length){cont.innerHTML=`<div class="empty"><div class="empty-ico">☀️</div><p>No tasks yet.<br>Tap ＋ or 🎙️ to add one.</p></div>`;return;}
-
+  if(!list.length){cont.innerHTML=`<div class="empty"><div class="empty-ico">☀️</div><p>No tasks for today.<br>Tap ＋ or 🎙️ to add, or open <strong>🧠 Dump</strong> to pick tasks.</p></div>`;return;}
   const pOrd={high:0,med:1,low:2};
   list.sort((a,b)=>{
     if(a.done!==b.done)return a.done?1:-1;
     if(a.deadline&&b.deadline)return new Date(a.deadline)-new Date(b.deadline);
-    if(a.deadline)return -1; if(b.deadline)return 1;
+    if(a.deadline)return -1;if(b.deadline)return 1;
     return pOrd[a.priority]-pOrd[b.priority];
   });
-
   const buckets={'⚡ Quick — 15 min':[],'🕐 Short — 30 min':[],'🕒 Longer tasks':[]};
   list.forEach(t=>{
     if(t.duration==='15')buckets['⚡ Quick — 15 min'].push(t);
     else if(t.duration==='30')buckets['🕐 Short — 30 min'].push(t);
     else buckets['🕒 Longer tasks'].push(t);
   });
-
   cont.innerHTML=Object.entries(buckets).filter(([,ts])=>ts.length).map(([label,ts])=>{
     const done=ts.filter(t=>t.done).length;
     return`<div class="sec-wrap">
@@ -420,68 +644,155 @@ function renderToday(){
         <div class="sec-left"><span class="sec-title">${label}</span><span class="badge ${done>0?'lit':''}">${done}/${ts.length}</span></div>
         <span class="caret">▾</span>
       </div>
-      <div class="sec-body card-list" style="margin-bottom:18px;">${ts.map(tRow).join('')}</div>
+      <div class="sec-body card-list" style="margin-bottom:16px;">${ts.map(tRow).join('')}</div>
     </div>`;
   }).join('');
 }
 
-function tRow(t){
+function tRow(t,isDump=false){
   const a=areaById(t.areaId);
   const pc={high:'c-hi',med:'c-med',low:'c-lo'}[t.priority]||'c-lo';
   const dl=fmtDL(t.deadline);
   const rem=t.reminder?`<span class="chip c-rem">🔔 ${new Date(t.reminder).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})}</span>`:'';
-  return`<div class="task-card ${t.done?'dim':''}">
-    <div class="chk ${t.done?'on':''}" onclick="toggleTask('${t.id}')"></div>
+  const dumpMoveBtn=isDump?`<button class="to-today-btn" onclick="dumpToToday('${t.id}')">→ Today</button>`:'';
+  const sendToDumpBtn=!isDump?`<button class="ib" title="Send to Brain Dump" onclick="todayToDump('${t.id}')">🧠</button>`:'';
+  return`<div class="task-card ${(!isDump&&t.done)?'dim':''}">
+    <div class="chk ${(!isDump&&t.done)?'on':''}" onclick="${isDump?'':` toggleTask('${t.id}')`}"></div>
     <div class="t-body">
-      <div class="t-name ${t.done?'done':''}">${t.name}</div>
+      <div class="t-name ${(!isDump&&t.done)?'done':''}">${t.name}</div>
       ${t.notes?`<div class="t-notes">${t.notes}</div>`:''}
       <div class="chips">
         <span class="chip c-area" style="background:${a.color}18;color:${a.color}">${a.emoji} ${a.name}</span>
         ${t.cat&&t.cat!=='General'?`<span class="chip c-cat">${t.cat}</span>`:''}
         <span class="chip ${pc}">${{high:'🔴 High',med:'🟡 Med',low:'🟢 Low'}[t.priority]}</span>
+        ${t.duration?`<span class="chip c-cat">${{15:'⚡ 15m',30:'🕐 30m','60+':'🕒 60+'}[t.duration]||''}</span>`:''}
         ${dl?`<span class="chip c-dl">${dl}</span>`:''}
         ${rem}
+        ${isDump?`<span class="chip c-dump">🧠 Dump</span>`:''}
       </div>
+      ${dumpMoveBtn?`<div style="margin-top:7px;">${dumpMoveBtn}</div>`:''}
     </div>
     <div class="t-actions">
-      <button class="ib" onclick="editTask('${t.id}')">✏️</button>
-      <button class="ib danger" onclick="delTask('${t.id}')">✕</button>
+      <button class="ib" onclick="${isDump?`editDumpTask('${t.id}')`:`editTask('${t.id}')`}">✏️</button>
+      ${sendToDumpBtn}
+      <button class="ib danger" onclick="${isDump?`delDump('${t.id}')`:`delTask('${t.id}')`}">✕</button>
     </div>
   </div>`;
 }
 
+// ── BRAIN DUMP ────────────────────────────────────────────────────────────────
+function renderDump(){
+  const cont=document.getElementById('dumpSecs');if(!cont)return;
+  let list=dumpFilter==='all'?[...dump]:dump.filter(t=>t.areaId===dumpFilter);
+  if(!list.length){cont.innerHTML=`<div class="empty"><div class="empty-ico">🧠</div><p>Brain Dump is empty.<br>Tap ＋ to capture anything on your mind.</p></div>`;return;}
+  // group by area
+  const groups={};
+  list.forEach(t=>{const k=t.areaId||'other';(groups[k]=groups[k]||[]).push(t);});
+  const pOrd={high:0,med:1,low:2};
+  Object.values(groups).forEach(g=>g.sort((a,b)=>pOrd[a.priority]-pOrd[b.priority]));
+  cont.innerHTML=Object.entries(groups).map(([aId,ts])=>{
+    const a=areaById(aId);
+    return`<div class="sec-wrap">
+      <div class="sec-hdr" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="sec-left"><span class="sec-title">${a.emoji} ${a.name}</span><span class="badge">${ts.length}</span></div>
+        <span class="caret">▾</span>
+      </div>
+      <div class="sec-body card-list" style="margin-bottom:16px;">${ts.map(t=>tRow(t,true)).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function dumpToToday(id){
+  const t=dump.find(t=>t.id===id);if(!t)return;
+  dump=dump.filter(t=>t.id!==id);
+  t.done=false;
+  tasks.push(t);
+  save();render();
+}
+function todayToDump(id){
+  const t=tasks.find(t=>t.id===id);if(!t)return;
+  tasks=tasks.filter(t=>t.id!==id);
+  t.done=false;
+  dump.push(t);
+  save();render();
+}
+function delDump(id){if(!confirm('Delete this task?'))return;dump=dump.filter(t=>t.id!==id);save();render();}
+
+// ── RECURRING ─────────────────────────────────────────────────────────────────
+function renderRecur(){
+  const cont=document.getElementById('recurList');if(!cont)return;
+  if(!recurs.length){cont.innerHTML=`<div class="empty"><div class="empty-ico">🔁</div><p>No recurring tasks yet.<br>Tap 🔁 to set one up.</p></div>`;return;}
+  cont.innerHTML=`<div class="card-list">`+recurs.map(r=>{
+    const a=areaById(r.areaId);
+    let freqStr=FREQ_LABELS[r.freq]||r.freq;
+    if(r.freq==='custom'&&r.days?.length)freqStr=r.days.map(d=>DAYS[d]).join(', ');
+    if(r.freq==='weekly'&&r.days?.length)freqStr=`Weekly on ${r.days.map(d=>DAYS[d]).join(', ')}`;
+    return`<div class="recur-card">
+      <div class="recur-icon">🔁</div>
+      <div class="t-body">
+        <div class="t-name">${r.name}</div>
+        <div class="chips">
+          <span class="chip c-area" style="background:${a.color}18;color:${a.color}">${a.emoji} ${a.name}</span>
+          <span class="chip c-recur">${freqStr}</span>
+          <span class="chip c-cat">${{15:'⚡ 15m',30:'🕐 30m','60+':'🕒 60+'}[r.duration]||''}</span>
+          <span class="chip ${{high:'c-hi',med:'c-med',low:'c-lo'}[r.priority]}">${{high:'🔴 High',med:'🟡 Med',low:'🟢 Low'}[r.priority]}</span>
+          ${r.reminder?`<span class="chip c-rem">🔔 ${r.reminder}</span>`:''}
+        </div>
+      </div>
+      <div class="t-actions">
+        <button class="ib danger" onclick="delRecur('${r.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('')+`</div>`;
+}
+
+function injectRecurringTasks(){
+  // Add recurring tasks that are due today if not already added today
+  const tk=todayKey();
+  recurs.forEach(r=>{
+    if(!recurDueToday(r))return;
+    const alreadyToday=tasks.some(t=>t.recurId===r.id&&t.addedKey===tk);
+    if(!alreadyToday){
+      tasks.push({id:uid(),recurId:r.id,addedKey:tk,name:r.name,notes:r.notes||'',areaId:r.areaId,cat:r.cat||'General',priority:r.priority||'med',duration:r.duration||'30',deadline:'',reminder:'',done:false});
+    }
+  });
+  save();
+}
+
+function delRecur(id){if(!confirm('Delete this recurring task?'))return;recurs=recurs.filter(r=>r.id!==id);save();render();}
+
 // ── AREAS ─────────────────────────────────────────────────────────────────────
 function renderAreas(){
-  const g=document.getElementById('areaGrid'); if(!g)return;
+  const g=document.getElementById('areaGrid');if(!g)return;
   g.innerHTML=areas.map(a=>{
     const at=tasks.filter(t=>t.areaId===a.id),done=at.filter(t=>t.done).length,pct=at.length?Math.round(done/at.length*100):0;
+    const dt=dump.filter(t=>t.areaId===a.id).length;
     return`<div class="area-card" style="--ac:${a.color}" onclick="openAreaDetail('${a.id}')">
       <div class="area-emoji">${a.emoji}</div>
       <div class="area-name">${a.name}</div>
-      <div class="area-stats">${at.length} tasks · ${pct}% done</div>
+      <div class="area-stats">${at.length} today · ${dt} in dump · ${pct}% done</div>
       <div class="area-bar-bg"><div class="area-bar-fill" style="width:${pct}%"></div></div>
     </div>`;
   }).join('')+`<button class="add-area-card" onclick="openAreaModal()">＋ Add area of life</button>`;
 }
-
 function openAreaDetail(aId){
   document.getElementById('areaGrid').style.display='none';
   document.getElementById('areaDetail').style.display='block';
   const a=areaById(aId);
   document.getElementById('aDetailTitle').textContent=`${a.emoji} ${a.name}`;
   const at=tasks.filter(t=>t.areaId===aId);
-  document.getElementById('aDetailBody').innerHTML=at.length
-    ?`<div class="card-list">${at.map(tRow).join('')}</div>`
-    :`<div class="empty"><div class="empty-ico">${a.emoji}</div><p>No tasks in this area yet.</p></div>`;
+  const dt=dump.filter(t=>t.areaId===aId);
+  let html='';
+  if(at.length){html+=`<div style="font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--soft);margin-bottom:6px;">Today</div><div class="card-list" style="margin-bottom:14px;">${at.map(t=>tRow(t)).join('')}</div>`;}
+  if(dt.length){html+=`<div style="font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--soft);margin-bottom:6px;">Brain Dump</div><div class="card-list">${dt.map(t=>tRow(t,true)).join('')}</div>`;}
+  if(!html)html=`<div class="empty"><div class="empty-ico">${a.emoji}</div><p>No tasks in this area yet.</p></div>`;
+  document.getElementById('aDetailBody').innerHTML=html;
 }
-function closeAreaDetail(){
-  document.getElementById('areaGrid').style.display='';
-  document.getElementById('areaDetail').style.display='none';
-}
+function closeAreaDetail(){document.getElementById('areaGrid').style.display='';document.getElementById('areaDetail').style.display='none';}
 
 // ── PROJECTS ──────────────────────────────────────────────────────────────────
 function renderProjects(){
-  const cont=document.getElementById('projList'); if(!cont)return;
+  const cont=document.getElementById('projList');if(!cont)return;
   if(!projects.length){cont.innerHTML=`<div class="empty"><div class="empty-ico">📁</div><p>No projects yet.<br>Tap 📁 to create one.</p></div>`;return;}
   cont.innerHTML=projects.map(p=>{
     const subs=p.subtasks||[],done=subs.filter(s=>s.done).length,pct=subs.length?Math.round(done/subs.length*100):0;
@@ -510,21 +821,81 @@ function renderProjects(){
   }).join('');
 }
 
+// ── MORNING PLANNING ──────────────────────────────────────────────────────────
+let morningSelected=new Set();
+function openMorningModal(force=false){
+  const tk=todayKey();
+  if(!force&&lastOpen===tk)return; // already shown today
+  if(!dump.length&&!force){lastOpen=tk;localStorage.setItem('md4_lastOpen',tk);return;}
+  morningSelected=new Set();
+  const items=dump.map(t=>{
+    const a=areaById(t.areaId);
+    const dl=fmtDL(t.deadline);
+    return`<div class="morning-item">
+      <div class="morning-check" id="mc-${t.id}" onclick="toggleMorning('${t.id}')"></div>
+      <div class="morning-item-body">
+        <div class="morning-item-name">${t.name}</div>
+        <div class="morning-item-meta">${a.emoji} ${a.name} · ${{high:'🔴 High',med:'🟡 Med',low:'🟢 Low'}[t.priority]}${dl?' · '+dl:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('morningItems').innerHTML=items||`<div class="empty" style="padding:20px 0"><p>Brain Dump is empty — nothing to pick!</p></div>`;
+  document.getElementById('morningOverlay').classList.add('open');
+  lastOpen=tk;localStorage.setItem('md4_lastOpen',tk);
+}
+function toggleMorning(id){
+  if(morningSelected.has(id)){morningSelected.delete(id);document.getElementById('mc-'+id)?.classList.remove('on');}
+  else{morningSelected.add(id);document.getElementById('mc-'+id)?.classList.add('on');}
+}
+function confirmMorning(){
+  morningSelected.forEach(id=>{
+    const t=dump.find(t=>t.id===id);if(!t)return;
+    dump=dump.filter(t=>t.id!==id);t.done=false;tasks.push(t);
+  });
+  save();render();closeMorning();
+}
+function closeMorning(){document.getElementById('morningOverlay').classList.remove('open');}
+
+// ── END OF DAY ────────────────────────────────────────────────────────────────
+function endOfDay(){
+  const unfinished=tasks.filter(t=>!t.done&&!t.recurId);
+  if(!unfinished.length){alert('🎉 All tasks are done! Nothing to move.');return;}
+  if(!confirm(`Move ${unfinished.length} unfinished task${unfinished.length>1?'s':''} back to Brain Dump?`))return;
+  unfinished.forEach(t=>{tasks=tasks.filter(x=>x.id!==t.id);t.done=false;dump.push(t);});
+  // remove completed recurring for today (they'll re-inject tomorrow)
+  tasks=tasks.filter(t=>!(t.recurId&&t.done));
+  save();render();
+  alert(`✅ ${unfinished.length} task${unfinished.length>1?'s':''} moved to Brain Dump. Done tasks cleared.`);
+}
+
 // ── TASK ACTIONS ──────────────────────────────────────────────────────────────
 function setFilter(id){activeFilter=id;render();}
+function setDumpFilter(id){dumpFilter=id;render();}
 function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;save();render();}}
 function delTask(id){if(!confirm('Delete this task?'))return;tasks=tasks.filter(t=>t.id!==id);save();render();}
-function clearTasks(){if(!confirm('Delete ALL tasks?'))return;tasks=[];save();render();}
+function clearToday(){if(!confirm('Clear all of today\'s tasks?'))return;tasks=[];save();render();}
 
 function editTask(id){
   const t=tasks.find(t=>t.id===id);if(!t)return;
   editId=id;
-  buildAreaSel(t.areaId); buildCatSel(t.cat);
-  selP(t.priority||'med'); selDur(t.duration||'30');
+  buildAreaSel('tArea',t.areaId);buildCatSel(t.cat);
+  selP(t.priority||'med');selDur(t.duration||'30');selLoc('today');
   document.getElementById('tName').value=t.name;
   document.getElementById('tNotes').value=t.notes||'';
   document.getElementById('tDeadline').value=t.deadline?t.deadline.slice(0,16):'';
   document.getElementById('tReminder').value=t.reminder?t.reminder.slice(0,16):'';
+  document.getElementById('tmTitle').textContent='Edit Task';
+  openModal('taskModal');
+}
+function editDumpTask(id){
+  const t=dump.find(t=>t.id===id);if(!t)return;
+  editId='dump:'+id;
+  buildAreaSel('tArea',t.areaId);buildCatSel(t.cat||'General');
+  selP(t.priority||'med');selDur(t.duration||'30');selLoc('dump');
+  document.getElementById('tName').value=t.name;
+  document.getElementById('tNotes').value=t.notes||'';
+  document.getElementById('tDeadline').value=t.deadline?t.deadline.slice(0,16):'';
+  document.getElementById('tReminder').value='';
   document.getElementById('tmTitle').textContent='Edit Task';
   openModal('taskModal');
 }
@@ -535,47 +906,106 @@ function delSub(pid,sid){const p=projects.find(p=>p.id===pid);if(p){p.subtasks=p
 function addSub(pid){const inp=document.getElementById('st-'+pid);const n=inp?.value.trim();if(!n)return;const p=projects.find(p=>p.id===pid);if(p){p.subtasks.push({id:uid(),name:n,done:false});save();render();}}
 function delProject(pid){if(!confirm('Delete this project?'))return;projects=projects.filter(p=>p.id!==pid);save();render();}
 
-// ── PRIORITY / DURATION ───────────────────────────────────────────────────────
+// ── SELECTORS ─────────────────────────────────────────────────────────────────
 function selP(p){selPri=p;document.querySelectorAll('.pbtn').forEach(b=>{b.className='pbtn';if(b.dataset.p===p)b.classList.add({high:'sh',med:'sm',low:'sl'}[p]);});}
 function selDur(d){selDuration=d;document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('sel',b.dataset.d===d));}
+function selDDur(d){selDDuration=d;document.querySelectorAll('[data-dd]').forEach(b=>b.classList.toggle('sel',b.dataset.dd===d));}
+function selRDur(d){selRDuration=d;document.querySelectorAll('[data-rd]').forEach(b=>b.classList.toggle('sel',b.dataset.rd===d));}
+function selRP(p){selRPri=p;document.querySelectorAll('#rPriRow .pbtn').forEach(b=>{b.className='pbtn';if(b.dataset.rp===p)b.classList.add({high:'sh',med:'sm',low:'sl'}[p]);});}
+function selFreq(f){
+  selFrequency=f;
+  document.querySelectorAll('[data-fr]').forEach(b=>b.classList.toggle('sel',b.dataset.fr===f));
+  document.getElementById('customDaysGroup').style.display=(f==='custom'||f==='weekly'||f==='fortnightly')?'block':'none';
+}
+function toggleDay(d){
+  if(selCustomDays.includes(d))selCustomDays=selCustomDays.filter(x=>x!==d);
+  else selCustomDays.push(d);
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('sel',selCustomDays.includes(+b.dataset.day)));
+}
+function selLoc(l){
+  taskLoc=l;
+  document.querySelectorAll('[data-loc]').forEach(b=>b.classList.toggle('sel',b.dataset.loc===l));
+}
 
 // ── TASK MODAL ────────────────────────────────────────────────────────────────
-function openTaskModal(name='',aId='',cat='',pri='med',dur='30',notes=''){
+function openTaskModal(name='',aId='',cat='',pri='med',dur='30',notes='',loc='today'){
   editId=null;
   document.getElementById('tmTitle').textContent='Add Task';
   document.getElementById('tName').value=name;
   document.getElementById('tNotes').value=notes;
   document.getElementById('tDeadline').value='';
   document.getElementById('tReminder').value='';
-  buildAreaSel(aId); buildCatSel(cat); selP(pri); selDur(dur);
+  buildAreaSel('tArea',aId);buildCatSel(cat);selP(pri);selDur(dur);selLoc(loc);
   openModal('taskModal');
   setTimeout(()=>document.getElementById('tName').focus(),300);
 }
-function buildAreaSel(sel=''){document.getElementById('tArea').innerHTML=areas.map(a=>`<option value="${a.id}" ${a.id===sel?'selected':''}>${a.emoji} ${a.name}</option>`).join('');}
+function buildAreaSel(elId,sel=''){document.getElementById(elId).innerHTML=areas.map(a=>`<option value="${a.id}" ${a.id===sel?'selected':''}>${a.emoji} ${a.name}</option>`).join('');}
 function buildCatSel(sel=''){document.getElementById('tCat').innerHTML=CATS.map(c=>`<option value="${c}" ${c===sel?'selected':''}>${c}</option>`).join('');}
+
 function saveTask(){
   const name=document.getElementById('tName').value.trim();if(!name){document.getElementById('tName').focus();return;}
   const t={
-    id:editId||uid(),name,
-    notes:document.getElementById('tNotes').value.trim(),
+    id:(editId&&!editId.startsWith('dump:'))?editId:uid(),
+    name,notes:document.getElementById('tNotes').value.trim(),
     areaId:document.getElementById('tArea').value,
     cat:document.getElementById('tCat').value,
-    priority:selPri, duration:selDuration,
+    priority:selPri,duration:selDuration,
     deadline:document.getElementById('tDeadline').value||'',
     reminder:document.getElementById('tReminder').value||'',
     done:false,
   };
-  if(editId){const i=tasks.findIndex(x=>x.id===editId);if(i>-1){t.done=tasks[i].done;tasks[i]=t;}}
-  else tasks.push(t);
+  if(editId&&!editId.startsWith('dump:')){
+    const i=tasks.findIndex(x=>x.id===editId);if(i>-1){t.done=tasks[i].done;tasks[i]=t;}
+  } else if(editId&&editId.startsWith('dump:')){
+    const rid=editId.replace('dump:','');
+    dump=dump.filter(x=>x.id!==rid);
+    if(taskLoc==='today')tasks.push(t);else dump.push(t);
+  } else {
+    if(taskLoc==='dump')dump.push(t);else tasks.push(t);
+  }
   if(t.reminder)scheduleReminder(t);
-  editId=null; save(); render(); closeModal('taskModal');
+  editId=null;save();render();closeModal('taskModal');
+}
+
+// ── DUMP MODAL ────────────────────────────────────────────────────────────────
+function openDumpModal(){
+  document.getElementById('dName').value='';document.getElementById('dNotes').value='';
+  document.getElementById('dDeadline').value='';selDDur('30');
+  buildAreaSel('dArea','');
+  openModal('dumpModal');setTimeout(()=>document.getElementById('dName').focus(),300);
+}
+function saveDumpTask(){
+  const name=document.getElementById('dName').value.trim();if(!name){document.getElementById('dName').focus();return;}
+  dump.push({id:uid(),name,notes:document.getElementById('dNotes').value.trim(),areaId:document.getElementById('dArea').value,cat:'General',priority:document.getElementById('dPri').value,duration:selDDuration,deadline:document.getElementById('dDeadline').value||'',reminder:'',done:false});
+  save();render();closeModal('dumpModal');
+}
+
+// ── RECURRING MODAL ───────────────────────────────────────────────────────────
+function openRecurModal(){
+  document.getElementById('rName').value='';document.getElementById('rNotes').value='';document.getElementById('rReminder').value='';
+  buildAreaSel('rArea','');
+  document.getElementById('rCat').innerHTML=CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+  selRDur('30');selRP('med');selFreq('daily');selCustomDays=[];
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('sel'));
+  openModal('recurModal');setTimeout(()=>document.getElementById('rName').focus(),300);
+}
+function saveRecur(){
+  const name=document.getElementById('rName').value.trim();if(!name){document.getElementById('rName').focus();return;}
+  recurs.push({
+    id:uid(),name,notes:document.getElementById('rNotes').value.trim(),
+    areaId:document.getElementById('rArea').value,cat:document.getElementById('rCat').value,
+    priority:selRPri,duration:selRDuration,freq:selFrequency,
+    days:selFrequency==='daily'?[0,1,2,3,4,5,6]:[...selCustomDays],
+    reminder:document.getElementById('rReminder').value||'',
+    startDate:new Date().toISOString(),
+  });
+  save();render();closeModal('recurModal');injectRecurringTasks();
 }
 
 // ── PROJECT MODAL ─────────────────────────────────────────────────────────────
 function openProjModal(){
   document.getElementById('pName').value='';document.getElementById('pDeadline').value='';
-  document.getElementById('pArea').innerHTML=areas.map(a=>`<option value="${a.id}">${a.emoji} ${a.name}</option>`).join('');
-  selEmoji='📁';
+  buildAreaSel('pArea','');selEmoji='📁';
   document.getElementById('pEmojiPicker').innerHTML=EMOJIS.map(e=>`<span class="ep ${e===selEmoji?'sel':''}" onclick="pickPEmoji('${e}')">${e}</span>`).join('');
   openModal('projModal');setTimeout(()=>document.getElementById('pName').focus(),300);
 }
@@ -605,29 +1035,23 @@ function saveArea(){
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');editId=null;}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('open');editId=null;}}));
-document.getElementById('fabMain').addEventListener('click',()=>{if(currentPage==='projects')openProjModal();else{editId=null;openTaskModal();}});
+
+document.getElementById('fabMain').addEventListener('click',()=>{
+  if(currentPage==='projects')openProjModal();
+  else if(currentPage==='dump')openDumpModal();
+  else if(currentPage==='recur')openRecurModal();
+  else{editId=null;openTaskModal('','','','med','30','',currentPage==='dump'?'dump':'today');}
+});
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
 function renderNotifBanner(){
   const b=document.getElementById('nBanner');if(!b)return;
   if(notifOn||Notification.permission==='granted'||Notification.permission==='denied'){b.innerHTML='';return;}
-  b.innerHTML=`<div class="nb">🔔 Enable notifications to get reminders<button onclick="requestNotif()">Enable</button></div>`;
+  b.innerHTML=`<div class="nb">🔔 Enable notifications for task reminders<button onclick="requestNotif()">Enable</button></div>`;
 }
-async function toggleNotif(){
-  if(notifOn){notifOn=false;save();render();return;}
-  await requestNotif();
-}
-async function requestNotif(){
-  if(!('Notification' in window)){alert('Notifications not supported here.');return;}
-  const p=await Notification.requestPermission();
-  notifOn=p==='granted';save();render();
-}
-function scheduleReminder(task){
-  if(Notification.permission!=='granted'||!task.reminder)return;
-  const ms=new Date(task.reminder)-Date.now();
-  if(ms<=0)return;
-  setTimeout(()=>new Notification('My Day 🔔',{body:task.name,icon:'icon-192.png'}),ms);
-}
+async function toggleNotif(){if(notifOn){notifOn=false;save();render();return;}await requestNotif();}
+async function requestNotif(){if(!('Notification' in window)){alert('Notifications not supported.');return;}const p=await Notification.requestPermission();notifOn=p==='granted';save();render();}
+function scheduleReminder(task){if(Notification.permission!=='granted'||!task.reminder)return;const ms=new Date(task.reminder)-Date.now();if(ms<=0)return;setTimeout(()=>new Notification('My Day 🔔',{body:task.name,icon:'icon-192.png'}),ms);}
 function restoreReminders(){tasks.forEach(t=>{if(t.reminder&&!t.done)scheduleReminder(t);});}
 
 // ── VOICE ─────────────────────────────────────────────────────────────────────
@@ -650,8 +1074,8 @@ function hideV(){document.getElementById('vstatus').classList.remove('on');}
 async function aiProcess(transcript){
   document.getElementById('aiMsg').classList.add('on');
   const aList=areas.map(a=>`${a.id}: ${a.name}`).join(', ');
-  const prompt=`You are a smart task assistant. Extract all details from this voice note and return ONLY valid JSON (no markdown):
-{"name":"concise task name","notes":"extra context if any, else empty","areaId":"best area id from list","cat":"one of: ${CATS.join(',')}","priority":"high|med|low","duration":"15|30|60+","deadline":"ISO datetime if mentioned else empty","reminder":"ISO datetime if they said remind me else empty"}
+  const prompt=`Smart task assistant. Extract all details from this voice note. Return ONLY valid JSON, no markdown:
+{"name":"concise task name","notes":"extra context or empty","areaId":"best area id","cat":"one of: ${CATS.join(',')}","priority":"high|med|low","duration":"15|30|60+","deadline":"ISO datetime if mentioned else empty","reminder":"ISO datetime if remind me mentioned else empty","loc":"today if urgent/specific date mentioned, else dump"}
 
 Areas: ${aList}
 Now: ${new Date().toISOString()}
@@ -662,7 +1086,7 @@ Voice: "${transcript}"`;
     const raw=data.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
     const p=JSON.parse(raw);
     document.getElementById('aiMsg').classList.remove('on');hideV();editId=null;
-    openTaskModal(p.name||transcript,p.areaId||areas[0]?.id,p.cat||'General',p.priority||'med',p.duration||'30',p.notes||'');
+    openTaskModal(p.name||transcript,p.areaId||areas[0]?.id,p.cat||'General',p.priority||'med',p.duration||'30',p.notes||'',p.loc||'today');
     if(p.deadline)document.getElementById('tDeadline').value=p.deadline.slice(0,16);
     if(p.reminder)document.getElementById('tReminder').value=p.reminder.slice(0,16);
   }catch(err){
@@ -674,8 +1098,11 @@ Voice: "${transcript}"`;
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+injectRecurringTasks();
 restoreReminders();
 render();
+// Show morning planning if dump has tasks and not yet shown today
+setTimeout(()=>openMorningModal(false), 800);
 </script>
 </body>
 </html>
