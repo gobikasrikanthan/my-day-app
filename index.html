@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Day</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2d5a3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Day">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --border: #e8e6df;
+  --text: #1a1a18;
+  --soft: #7a7970;
+  --accent: #2d5a3d;
+  --accent-light: #e8f0ea;
+  --project: #4a3f7a;
+  --project-light: #eeebf8;
+  --danger: #c0392b;
+  --r: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 110px; }
+
+/* NAV TABS */
+.nav-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.nav-tab { flex: 1; padding: 16px 8px 14px; font-size: 0.8rem; font-weight: 600; text-align: center; cursor: pointer; color: var(--soft); border-bottom: 2.5px solid transparent; transition: all 0.2s; font-family: 'DM Sans', sans-serif; background: none; border-left: none; border-right: none; border-top: none; }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* HEADER */
+.page-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px 12px; }
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.app-title { font-family: 'DM Serif Display', serif; font-size: 1.35rem; }
+.date-label { font-size: 0.76rem; color: var(--soft); font-weight: 500; }
+.progress-row { display: flex; align-items: center; gap: 10px; }
+.bar-bg { flex: 1; height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+.bar-text { font-size: 0.76rem; color: var(--soft); white-space: nowrap; font-weight: 500; }
+
+/* FILTER TABS */
+.filter-row { overflow-x: auto; padding: 12px 20px; display: flex; gap: 8px; scrollbar-width: none; background: var(--surface); border-bottom: 1px solid var(--border); }
+.filter-row::-webkit-scrollbar { display: none; }
+.ftab { white-space: nowrap; padding: 5px 13px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--surface); font-size: 0.78rem; font-weight: 500; color: var(--soft); cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.ftab.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* MAIN */
+main { padding: 16px 20px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* SECTION */
+.section-block { margin-bottom: 18px; }
+.section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; cursor: pointer; user-select: none; }
+.section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); display: flex; align-items: center; gap: 7px; }
+.count-badge { background: var(--surface2); color: var(--soft); border-radius: 99px; padding: 1px 8px; font-size: 0.7rem; font-weight: 600; }
+.count-badge.done { background: var(--accent-light); color: var(--accent); }
+.caret { font-size: 0.65rem; color: var(--soft); transition: transform 0.2s; }
+.section-block.collapsed .caret { transform: rotate(-90deg); }
+.section-block.collapsed .task-card { display: none; }
+.section-block.collapsed .project-card { display: none; }
+
+/* TASK CARD */
+.task-card { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; }
+.task-row { display: flex; align-items: center; gap: 11px; padding: 12px 14px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.task-row:last-child { border-bottom: none; }
+.task-row:hover { background: var(--bg); }
+.check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: white; }
+.check:hover { border-color: var(--accent); }
+.check.on { background: var(--accent); border-color: var(--accent); }
+.check.on::after { content: '✓'; color: white; font-size: 0.68rem; font-weight: 700; }
+.t-body { flex: 1; min-width: 0; }
+.t-name { font-size: 0.88rem; color: var(--text); }
+.t-name.done { text-decoration: line-through; color: var(--soft); }
+.t-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+.pdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ph { background: #e74c3c; } .pm { background: #f39c12; } .pl { background: #95a5a6; }
+.sub-badge { font-size: 0.67rem; background: var(--accent-light); color: var(--accent); border-radius: 4px; padding: 1px 6px; font-weight: 500; }
+.del-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.95rem; padding: 4px; transition: color 0.2s; flex-shrink: 0; }
+.del-btn:hover { color: var(--danger); }
+
+/* PROJECT CARD */
+.project-card { background: var(--surface); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; }
+.project-hdr { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+.project-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.project-name { font-size: 0.95rem; font-weight: 600; color: var(--project); display: flex; align-items: center; gap: 8px; }
+.project-emoji { font-size: 1.1rem; }
+.proj-del-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.85rem; padding: 4px 8px; border-radius: 6px; transition: color 0.2s; }
+.proj-del-btn:hover { color: var(--danger); }
+.proj-bar-bg { height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.proj-bar-fill { height: 100%; background: var(--project); border-radius: 99px; transition: width 0.4s ease; }
+.proj-stats { font-size: 0.72rem; color: var(--soft); margin-top: 5px; }
+.subtask-row { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.subtask-row:last-child { border-bottom: none; }
+.subtask-row:hover { background: var(--bg); }
+.sq-check { width: 17px; height: 17px; border-radius: 4px; border: 2px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; background: white; }
+.sq-check:hover { border-color: var(--project); }
+.sq-check.on { background: var(--project); border-color: var(--project); }
+.sq-check.on::after { content: '✓'; color: white; font-size: 0.6rem; font-weight: 700; }
+.st-name { flex: 1; font-size: 0.85rem; color: var(--text); }
+.st-name.done { text-decoration: line-through; color: var(--soft); }
+.add-subtask-row { padding: 10px 16px; display: flex; gap: 8px; background: var(--bg); }
+.add-subtask-input { flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; background: white; color: var(--text); outline: none; }
+.add-subtask-input:focus { border-color: var(--project); }
+.add-subtask-btn { background: var(--project); color: white; border: none; border-radius: 8px; padding: 7px 12px; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 36px 20px; color: var(--soft); font-size: 0.85rem; line-height: 1.6; }
+.empty-icon { font-size: 2rem; margin-bottom: 10px; }
+
+/* FAB */
+.fab-area { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; z-index: 200; }
+.fab { width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 18px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; }
+.fab:hover { transform: scale(1.08); }
+.fab-add { background: var(--accent); color: white; }
+.fab-voice { background: white; color: var(--accent); border: 2px solid var(--accent); }
+.fab-proj { background: var(--project); color: white; }
+.fab-voice.rec { background: #e74c3c; border-color: #e74c3c; color: white; animation: rpulse 1s infinite; }
+@keyframes rpulse { 0%,100%{box-shadow:0 4px 18px rgba(231,76,60,.3)} 50%{box-shadow:0 4px 28px rgba(231,76,60,.6)} }
+
+/* MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.38); z-index: 300; align-items: flex-end; justify-content: center; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 22px 20px 34px; width: 100%; max-width: 600px; animation: sup .25s ease; max-height: 90vh; overflow-y: auto; }
+@keyframes sup { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+.modal-x { background: var(--surface2); border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 0.9rem; color: var(--soft); }
+.fg { margin-bottom: 13px; }
+.fl { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); margin-bottom: 5px; display: block; }
+.fi, .fs { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.88rem; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color .2s; }
+.fi:focus, .fs:focus { border-color: var(--accent); }
+.prow { display: flex; gap: 7px; }
+.pbtn { flex: 1; padding: 8px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); font-size: 0.78rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; color: var(--soft); }
+.pbtn.sh { background: #fdecea; border-color: #e74c3c; color: #e74c3c; }
+.pbtn.sm { background: #fef9ec; border-color: #f39c12; color: #f39c12; }
+.pbtn.sl { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.btn-primary { width: 100%; padding: 13px; background: var(--accent); color: white; border: none; border-radius: 10px; font-size: 0.92rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 4px; }
+.btn-project { background: var(--project); }
+.ai-msg { font-size: 0.78rem; color: var(--soft); text-align: center; padding: 7px; display: none; }
+.ai-msg.on { display: block; }
+
+/* VOICE STATUS */
+.vstatus { display: none; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r); padding: 12px 15px; margin-bottom: 14px; font-size: 0.83rem; color: var(--soft); align-items: center; gap: 9px; }
+.vstatus.on { display: flex; }
+.vdot { width: 9px; height: 9px; border-radius: 50%; background: #e74c3c; animation: vp 1s infinite; flex-shrink: 0; }
+@keyframes vp { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* EMOJI PICKER */
+.emoji-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.epick { font-size: 1.3rem; cursor: pointer; padding: 4px; border-radius: 6px; border: 2px solid transparent; transition: border-color .15s; }
+.epick.sel { border-color: var(--project); background: var(--project-light); }
+
+/* INLINE NEW CAT */
+.inline-new { display: none; margin-top: 8px; padding: 10px; background: var(--surface2); border-radius: 10px; gap: 8px; }
+.inline-new.on { display: flex; }
+
+/* SECTION DELETE */
+.section-del { background: none; border: none; color: #ddd; cursor: pointer; font-size: 0.72rem; padding: 1px 4px; margin-left: 2px; transition: color .2s; }
+.section-del:hover { color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchPage('tasks')">📋 Tasks</button>
+  <button class="nav-tab" onclick="switchPage('projects')">📁 Projects</button>
+</div>
+
+<!-- TASKS PAGE -->
+<div class="page active" id="page-tasks">
+  <div class="page-header">
+    <div class="header-top">
+      <span class="app-title">My Day</span>
+      <span class="date-label" id="dateLabel"></span>
+    </div>
+    <div class="progress-row">
+      <div class="bar-bg"><div class="bar-fill" id="taskBar"></div></div>
+      <span class="bar-text" id="taskBarText">0 / 0 done</span>
+    </div>
+  </div>
+  <div class="filter-row" id="filterRow"></div>
+  <main>
+    <div class="vstatus" id="vstatus"><div class="vdot"></div><span id="vstatusText">Listening…</span></div>
+    <div class="ai-msg" id="aiMsg">✨ AI is categorising your task…</div>
+    <div id="taskSections"></div>
+  </main>
+</div>
+
+<!-- PROJECTS PAGE -->
+<div class="page" id="page-projects">
+  <div class="page-header">
+    <div class="header-top">
+      <span class="app-title">Projects</span>
+      <span class="date-label" id="projDateLabel"></span>
+    </div>
+    <div class="progress-row">
+      <div class="bar-bg"><div class="bar-fill" id="projBar" style="background:var(--project)"></div></div>
+      <span class="bar-text" id="projBarText">0 / 0 subtasks done</span>
+    </div>
+  </div>
+  <main><div id="projectSections"></div></main>
+</div>
+
+<!-- FAB -->
+<div class="fab-area">
+  <button class="fab fab-voice" id="voiceBtn" title="Dictate task">🎙️</button>
+  <button class="fab fab-add" id="addTaskBtn" title="Add task">＋</button>
+  <button class="fab fab-proj" id="addProjBtn" title="New project" style="display:none">📁</button>
+</div>
+
+<!-- TASK MODAL -->
+<div class="overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-title">Add Task <button class="modal-x" onclick="closeModal('taskModal')">✕</button></div>
+    <div class="fg"><label class="fl">Task name</label><input class="fi" id="tName" placeholder="What needs doing?"></div>
+    <div class="fg">
+      <label class="fl">Category</label>
+      <select class="fs" id="tCat"></select>
+      <div class="inline-new" id="newCatBox">
+        <input class="fi" id="newCatName" placeholder="New category name…" style="margin-bottom:0">
+        <button class="btn-primary" style="padding:10px;margin-top:0;width:auto;white-space:nowrap" onclick="saveNewCategory()">Add</button>
+      </div>
+    </div>
+    <div class="fg" id="tSubGrp" style="display:none"><label class="fl">Subcategory</label><select class="fs" id="tSub"></select></div>
+    <div class="fg"><label class="fl">Priority</label>
+      <div class="prow">
+        <button class="pbtn" data-p="high" onclick="selP('high')">🔴 High</button>
+        <button class="pbtn sm" data-p="med" onclick="selP('med')">🟡 Medium</button>
+        <button class="pbtn" data-p="low" onclick="selP('low')">🟢 Low</button>
+      </div>
+    </div>
+    <div class="ai-msg" id="aiMsgModal">✨ AI is categorising…</div>
+    <button class="btn-primary" onclick="saveTask()">Add Task</button>
+  </div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="overlay" id="projModal">
+  <div class="modal">
+    <div class="modal-title">New Project <button class="modal-x" onclick="closeModal('projModal')">✕</button></div>
+    <div class="fg"><label class="fl">Project name</label><input class="fi" id="pName" placeholder="e.g. Kitchen renovation"></div>
+    <div class="fg"><label class="fl">Icon</label><div class="emoji-row" id="emojiRow"></div></div>
+    <div class="fg"><label class="fl">Category tag (optional)</label><input class="fi" id="pTag" placeholder="e.g. Home Admin, Business…"></div>
+    <button class="btn-primary btn-project" onclick="saveProject()">Create Project</button>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let CATS = JSON.parse(localStorage.getItem('myCats') || 'null') || [
+  { id:'laundry',  name:'🧺 Laundry',       subs:[] },
+  { id:'cleaning', name:'🧹 Cleaning',       subs:['Kitchen','Bathroom','Master bedroom','Kids bedrooms','Guest room','Office 1','Office 2','Play room','Hallway','Laundry room','Garage','Living room'] },
+  { id:'meals',    name:'🍽️ Meal Planning',  subs:['Meal plan','Order groceries','Meal prep'] },
+  { id:'kids',     name:'👧 Kids Admin',     subs:[] },
+  { id:'home',     name:'🏠 Home Admin',     subs:[] },
+  { id:'business', name:'💼 Business Admin', subs:[] },
+  { id:'baby',     name:'👶 Baby',           subs:[] },
+  { id:'other',    name:'📌 Other',          subs:[] },
+];
+const BUILT_IN_IDS = ['laundry','cleaning','meals','kids','home','business','baby','other'];
+let tasks    = JSON.parse(localStorage.getItem('myTasks2')    || '[]');
+let projects = JSON.parse(localStorage.getItem('myProjects2') || '[]');
+let activeFilter = 'all';
+let selPriority  = 'med';
+let selEmoji     = '📁';
+let isRecording  = false;
+let recognition  = null;
+let currentPage  = 'tasks';
+
+const EMOJIS = ['📁','🏠','💼','🎯','🌱','✈️','🎨','🛒','💪','📚','🔧','🌟','🎉','🚀','❤️','🏋️','🍳','🧹','🧺','📦'];
+
+// ─── PERSIST ────────────────────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('myTasks2',    JSON.stringify(tasks));
+  localStorage.setItem('myProjects2', JSON.stringify(projects));
+  localStorage.setItem('myCats',      JSON.stringify(CATS));
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function catById(id) { return CATS.find(c=>c.id===id) || {id:'other',name:'📌 Other',subs:[]}; }
+function uid()       { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function todayStr()  { return new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'}); }
+
+// ─── PAGE SWITCH ─────────────────────────────────────────────────────────────
+function switchPage(p) {
+  currentPage = p;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&p==='tasks')||(i===1&&p==='projects')));
+  document.getElementById('addTaskBtn').style.display = p==='tasks'   ? 'flex' : 'none';
+  document.getElementById('addProjBtn').style.display = p==='projects'? 'flex' : 'none';
+  document.getElementById('voiceBtn').style.display   = p==='tasks'   ? 'flex' : 'none';
+  render();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() { renderFilters(); renderTaskSections(); renderTaskProgress(); renderProjects(); renderProjProgress(); }
+
+function renderTaskProgress() {
+  const tot=tasks.length, done=tasks.filter(t=>t.done).length;
+  document.getElementById('taskBar').style.width = (tot?Math.round(done/tot*100):0)+'%';
+  document.getElementById('taskBarText').textContent = `${done} / ${tot} done`;
+}
+
+function renderFilters() {
+  const used=['all',...new Set(tasks.map(t=>t.cat))];
+  document.getElementById('filterRow').innerHTML = used.map(id=>{
+    const lbl=id==='all'?'✦ All':catById(id).name;
+    return `<button class="ftab ${activeFilter===id?'active':''}" onclick="setFilter('${id}')">${lbl}</button>`;
+  }).join('');
+}
+
+function renderTaskSections() {
+  const cont=document.getElementById('taskSections');
+  const list=activeFilter==='all'?tasks:tasks.filter(t=>t.cat===activeFilter);
+  if(!list.length){
+    cont.innerHTML=`<div class="empty"><div class="empty-icon">📋</div>No tasks yet.<br>Tap <strong>＋</strong> or 🎙️ to add one.</div>`;
+    return;
+  }
+  const groups={};
+  list.forEach(t=>{(groups[t.cat]=groups[t.cat]||[]).push(t);});
+  const pOrd={high:0,med:1,low:2};
+  Object.values(groups).forEach(g=>g.sort((a,b)=>a.done!==b.done?(a.done?1:-1):pOrd[a.priority]-pOrd[b.priority]));
+
+  cont.innerHTML=Object.entries(groups).map(([cid,ctasks])=>{
+    const cat=catById(cid);
+    const done=ctasks.filter(t=>t.done).length;
+    const rows=ctasks.map(t=>{
+      const pc={high:'ph',med:'pm',low:'pl'}[t.priority]||'pl';
+      const sb=t.sub?`<span class="sub-badge">${t.sub}</span>`:'';
+      return `<div class="task-row">
+        <div class="check ${t.done?'on':''}" onclick="toggleTask('${t.id}')"></div>
+        <div class="t-body">
+          <div class="t-name ${t.done?'done':''}">${t.name}</div>
+          <div class="t-meta"><div class="pdot ${pc}"></div>${sb}</div>
+        </div>
+        <button class="del-btn" onclick="delTask('${t.id}')">✕</button>
+      </div>`;
+    }).join('');
+    const isCustom=!BUILT_IN_IDS.includes(cid);
+    const delBtn=isCustom?`<button class="section-del" onclick="deleteCategory('${cid}',event)" title="Delete category">🗑</button>`:'';
+    return `<div class="section-block" id="sec-${cid}">
+      <div class="section-hdr" onclick="toggleSec('sec-${cid}')">
+        <span class="section-label">${cat.name}<span class="count-badge ${done>0?'done':''}">${done}/${ctasks.length}</span>${delBtn}</span>
+        <span class="caret">▾</span>
+      </div>
+      <div class="task-card">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── PROJECTS ─────────────────────────────────────────────────────────────────
+function renderProjProgress() {
+  const allSubs=projects.flatMap(p=>p.subtasks||[]);
+  const tot=allSubs.length, done=allSubs.filter(s=>s.done).length;
+  document.getElementById('projBar').style.width=(tot?Math.round(done/tot*100):0)+'%';
+  document.getElementById('projBarText').textContent=`${done} / ${tot} subtasks done`;
+}
+
+function renderProjects() {
+  const cont=document.getElementById('projectSections');
+  if(!projects.length){
+    cont.innerHTML=`<div class="empty"><div class="empty-icon">📁</div>No projects yet.<br>Tap the purple 📁 button to create one.</div>`;
+    return;
+  }
+  const groups={};
+  projects.forEach(p=>{const k=p.tag||'General';(groups[k]=groups[k]||[]).push(p);});
+  cont.innerHTML=Object.entries(groups).map(([tag,projs])=>{
+    const cards=projs.map(p=>renderProjectCard(p)).join('');
+    const safeTag=tag.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+    return `<div class="section-block" id="psec-${safeTag}">
+      <div class="section-hdr" onclick="toggleSec('psec-${safeTag}')">
+        <span class="section-label">${tag}<span class="count-badge">${projs.length}</span></span>
+        <span class="caret">▾</span>
+      </div>
+      ${cards}
+    </div>`;
+  }).join('');
+}
+
+function renderProjectCard(p) {
+  const subs=p.subtasks||[];
+  const done=subs.filter(s=>s.done).length;
+  const pct=subs.length?Math.round(done/subs.length*100):0;
+  const rows=subs.map(s=>`
+    <div class="subtask-row">
+      <div class="sq-check ${s.done?'on':''}" onclick="toggleSubtask('${p.id}','${s.id}')"></div>
+      <div class="st-name ${s.done?'done':''}">${s.name}</div>
+      <button class="del-btn" onclick="delSubtask('${p.id}','${s.id}')">✕</button>
+    </div>`).join('');
+  return `<div class="project-card" id="proj-${p.id}">
+    <div class="project-hdr">
+      <div class="project-top">
+        <span class="project-name"><span class="project-emoji">${p.emoji||'📁'}</span>${p.name}</span>
+        <button class="proj-del-btn" onclick="deleteProject('${p.id}')">🗑 Delete</button>
+      </div>
+      <div class="proj-bar-bg"><div class="proj-bar-fill" style="width:${pct}%"></div></div>
+      <div class="proj-stats">${done} of ${subs.length} subtasks · ${pct}% complete</div>
+    </div>
+    <div>${rows}</div>
+    <div class="add-subtask-row">
+      <input class="add-subtask-input" id="st-${p.id}" placeholder="Add a subtask…" onkeydown="if(event.key==='Enter')addSubtask('${p.id}')">
+      <button class="add-subtask-btn" onclick="addSubtask('${p.id}')">Add</button>
+    </div>
+  </div>`;
+}
+
+// ─── TASK ACTIONS ─────────────────────────────────────────────────────────────
+function setFilter(id)  { activeFilter=id; render(); }
+function toggleSec(id)  { document.getElementById(id)?.classList.toggle('collapsed'); }
+function toggleTask(id) { const t=tasks.find(t=>t.id===id); if(t){t.done=!t.done;save();render();} }
+function delTask(id)    { tasks=tasks.filter(t=>t.id!==id); save(); render(); }
+function deleteCategory(cid,e) {
+  e.stopPropagation();
+  if(!confirm('Delete this category and all its tasks?'))return;
+  tasks=tasks.filter(t=>t.cat!==cid);
+  CATS=CATS.filter(c=>c.id!==cid);
+  if(activeFilter===cid)activeFilter='all';
+  save(); render();
+}
+
+// ─── PROJECT ACTIONS ──────────────────────────────────────────────────────────
+function toggleSubtask(pid,sid) {
+  const p=projects.find(p=>p.id===pid); if(!p)return;
+  const s=p.subtasks.find(s=>s.id===sid); if(s){s.done=!s.done;save();render();}
+}
+function delSubtask(pid,sid) {
+  const p=projects.find(p=>p.id===pid);
+  if(p){p.subtasks=p.subtasks.filter(s=>s.id!==sid);save();render();}
+}
+function addSubtask(pid) {
+  const inp=document.getElementById('st-'+pid);
+  const name=inp?.value.trim(); if(!name)return;
+  const p=projects.find(p=>p.id===pid);
+  if(p){p.subtasks.push({id:uid(),name,done:false});save();render();}
+}
+function deleteProject(pid) {
+  if(!confirm('Delete this project and all its subtasks?'))return;
+  projects=projects.filter(p=>p.id!==pid);save();render();
+}
+
+// ─── PRIORITY ─────────────────────────────────────────────────────────────────
+function selP(p) {
+  selPriority=p;
+  document.querySelectorAll('.pbtn').forEach(b=>{
+    b.className='pbtn';
+    if(b.dataset.p===p)b.classList.add({high:'sh',med:'sm',low:'sl'}[p]);
+  });
+}
+
+// ─── TASK MODAL ───────────────────────────────────────────────────────────────
+function openTaskModal(prefill='',catId='',sub='',priority='med') {
+  document.getElementById('tName').value=prefill;
+  buildCatSelect(catId);
+  selP(priority);
+  document.getElementById('taskModal').classList.add('open');
+  setTimeout(()=>document.getElementById('tName').focus(),300);
+}
+
+function buildCatSelect(selCat='') {
+  const sel=document.getElementById('tCat');
+  sel.innerHTML=CATS.map(c=>`<option value="${c.id}" ${c.id===selCat?'selected':''}>${c.name}</option>`).join('')
+    +`<option value="__new__">＋ New category…</option>`;
+  updateSubSelect(sel.value);
+  sel.onchange=()=>{
+    if(sel.value==='__new__'){document.getElementById('newCatBox').classList.add('on');}
+    else{document.getElementById('newCatBox').classList.remove('on');updateSubSelect(sel.value);}
+  };
+}
+
+function updateSubSelect(catId) {
+  const cat=catById(catId);
+  const grp=document.getElementById('tSubGrp'), sel=document.getElementById('tSub');
+  if(cat?.subs?.length){
+    grp.style.display='block';
+    sel.innerHTML=`<option value="">None</option>`+cat.subs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  } else { grp.style.display='none'; }
+}
+
+function saveNewCategory() {
+  const name=document.getElementById('newCatName').value.trim(); if(!name)return;
+  const id='cat_'+uid();
+  CATS.push({id,name:'🏷️ '+name,subs:[]});
+  save(); buildCatSelect(id);
+  document.getElementById('newCatBox').classList.remove('on');
+  document.getElementById('newCatName').value='';
+}
+
+function saveTask() {
+  const name=document.getElementById('tName').value.trim(); if(!name){document.getElementById('tName').focus();return;}
+  let cat=document.getElementById('tCat').value;
+  if(cat==='__new__')cat='other';
+  const sub=document.getElementById('tSub').value||'';
+  tasks.push({id:uid(),name,cat,sub,priority:selPriority,done:false});
+  save(); render(); closeModal('taskModal');
+}
+
+// ─── PROJECT MODAL ────────────────────────────────────────────────────────────
+function openProjModal() {
+  document.getElementById('pName').value='';
+  document.getElementById('pTag').value='';
+  selEmoji='📁';
+  document.getElementById('emojiRow').innerHTML=EMOJIS.map(e=>
+    `<span class="epick ${e===selEmoji?'sel':''}" onclick="pickEmoji('${e}')">${e}</span>`
+  ).join('');
+  document.getElementById('projModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pName').focus(),300);
+}
+
+function pickEmoji(e) {
+  selEmoji=e;
+  document.querySelectorAll('.epick').forEach(el=>el.classList.toggle('sel',el.textContent===e));
+}
+
+function saveProject() {
+  const name=document.getElementById('pName').value.trim(); if(!name){document.getElementById('pName').focus();return;}
+  const tag=document.getElementById('pTag').value.trim()||'General';
+  projects.push({id:uid(),name,emoji:selEmoji,tag,subtasks:[]});
+  save(); render(); closeModal('projModal');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById('aiMsgModal')?.classList.remove('on');
+}
+
+document.getElementById('addTaskBtn').addEventListener('click',()=>openTaskModal());
+document.getElementById('addProjBtn').addEventListener('click',()=>openProjModal());
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ─── VOICE ───────────────────────────────────────────────────────────────────
+const voiceBtn=document.getElementById('voiceBtn');
+voiceBtn.addEventListener('click',toggleVoice);
+
+function toggleVoice() {
+  if(isRecording){stopRec();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Voice dictation not supported. Try Chrome or Safari.');return;}
+  recognition=new SR(); recognition.lang='en-AU'; recognition.interimResults=false; recognition.maxAlternatives=1;
+  recognition.onstart=()=>{isRecording=true;voiceBtn.classList.add('rec');voiceBtn.textContent='⏹';showV('Listening… speak your task');};
+  recognition.onresult=async(e)=>{const t=e.results[0][0].transcript;showV(`Heard: "${t}"`);stopRec();await aiCat(t);};
+  recognition.onerror=()=>{stopRec();hideV();};
+  recognition.onend=()=>{if(isRecording)stopRec();};
+  recognition.start();
+}
+function stopRec(){isRecording=false;voiceBtn.classList.remove('rec');voiceBtn.textContent='🎙️';recognition?.stop();}
+function showV(txt){document.getElementById('vstatus').classList.add('on');document.getElementById('vstatusText').textContent=txt;}
+function hideV(){document.getElementById('vstatus').classList.remove('on');}
+
+async function aiCat(transcript) {
+  document.getElementById('aiMsg').classList.add('on');
+  const catList=CATS.map(c=>{const s=c.subs.length?` (subcategories: ${c.subs.join(', ')})`:'';return `- ${c.id}: ${c.name}${s}`;}).join('\n');
+  const prompt=`You are a household/business task assistant. Given this voice-dictated task, return ONLY valid JSON (no markdown):
+{"name":"cleaned task name","cat":"best category id","sub":"subcategory or empty","priority":"high|med|low"}
+
+Categories:\n${catList}\n\nTask: "${transcript}"`;
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const raw=data.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    document.getElementById('aiMsg').classList.remove('on');
+    hideV();
+    openTaskModal(parsed.name||transcript,parsed.cat||'other',parsed.sub||'',parsed.priority||'med');
+    if(parsed.sub){const ss=document.getElementById('tSub');[...ss.options].forEach(o=>{if(o.value===parsed.sub)o.selected=true;});}
+  } catch(err) {
+    document.getElementById('aiMsg').classList.remove('on');
+    hideV();
+    openTaskModal(transcript);
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.getElementById('dateLabel').textContent=todayStr();
+document.getElementById('projDateLabel').textContent=todayStr();
+render();
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
