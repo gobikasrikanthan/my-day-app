@@ -205,6 +205,34 @@ textarea.fi{resize:vertical;min-height:60px;}
 .t2t:hover{background:var(--acc);color:#fff;}
 .alloc-btn{background:var(--unll);color:var(--unl);border:1px solid var(--unl);border-radius:7px;padding:3px 8px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
 .alloc-btn:hover{background:var(--unl);color:#fff;}
+/* ── CALENDAR WIDGET ── */
+.cal-wrap{position:relative;}
+.cal-trigger{width:100%;padding:10px 12px;border:1.5px solid var(--bdr);border-radius:10px;font-size:.87rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s;}
+.cal-trigger:hover,.cal-trigger.open{border-color:var(--acc);}
+.cal-trigger-txt{flex:1;}
+.cal-trigger-ico{font-size:1rem;opacity:.5;}
+.cal-popup{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--sur);border:1.5px solid var(--bdr);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:800;overflow:hidden;}
+.cal-popup.on{display:block;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;border-bottom:1px solid var(--bdr);}
+.cal-nav{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--sft);padding:4px 8px;border-radius:7px;transition:background .15s;}
+.cal-nav:hover{background:var(--sur2);}
+.cal-month-lbl{font-family:'Instrument Serif',serif;font-size:1rem;color:var(--txt);}
+.cal-days-hdr{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 10px 4px;}
+.cal-day-hdr{text-align:center;font-size:.65rem;font-weight:700;color:var(--sft);letter-spacing:.06em;text-transform:uppercase;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 10px 10px;gap:2px;}
+.cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:.82rem;cursor:pointer;color:var(--txt);border:none;background:none;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.cal-cell:hover{background:var(--sur2);}
+.cal-cell.other-month{color:var(--bdr);}
+.cal-cell.today{font-weight:700;color:var(--acc);}
+.cal-cell.selected{background:var(--acc);color:#fff!important;font-weight:700;}
+.cal-cell.past{color:var(--bdr);cursor:default;}
+.cal-cell.past:hover{background:none;}
+.cal-time-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--bdr);background:var(--sur2);}
+.cal-time-lbl{font-size:.72rem;font-weight:600;color:var(--sft);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+.cal-time-inp{flex:1;border:1.5px solid var(--bdr);border-radius:8px;padding:7px 10px;font-size:.85rem;font-family:'DM Sans',sans-serif;background:var(--sur);color:var(--txt);outline:none;}
+.cal-time-inp:focus{border-color:var(--acc);}
+.cal-clear{background:none;border:none;cursor:pointer;color:var(--sft);font-size:.75rem;padding:4px 8px;border-radius:6px;font-family:'DM Sans',sans-serif;}
+.cal-clear:hover{background:var(--wrnl);color:var(--wrn);}
 </style>
 </head>
 <body>
@@ -318,7 +346,7 @@ textarea.fi{resize:vertical;min-height:60px;}
     <div class="r2"><div class="fg"><label class="fl">Area of life</label><select class="fs" id="alArea"></select></div><div class="fg"><label class="fl">Category</label><select class="fs" id="alCat"></select></div></div>
     <div class="fg"><label class="fl">Duration</label><div class="brow"><button class="xb" data-ald="5" onclick="sDur('5','alD')">⚡ 5m</button><button class="xb" data-ald="15" onclick="sDur('15','alD')">🕐 15m</button><button class="xb" data-ald="30" onclick="sDur('30','alD')">🕑 30m</button><button class="xb" data-ald="60" onclick="sDur('60','alD')">🕒 1hr</button><button class="xb" data-ald="60+" onclick="sDur('60+','alD')">🕓 1hr+</button></div></div>
     <div class="fg"><label class="fl">Priority</label><div class="brow"><button class="xb" data-alp="high" onclick="sPri('high','alP')">🔴 High</button><button class="xb" data-alp="med" onclick="sPri('med','alP')">🟡 Medium</button><button class="xb" data-alp="low" onclick="sPri('low','alP')">🟢 Low</button></div></div>
-    <div class="fg"><label class="fl">Deadline</label><input class="fi" id="alDead" type="datetime-local"></div>
+    <div class="fg"><label class="fl">Deadline</label><div class="cal-wrap" id="cw-alDead"><button type="button" class="cal-trigger" onclick="toggleCal('alDead')"><span class="cal-trigger-txt" id="ctt-alDead">No deadline</span><span class="cal-trigger-ico">📅</span></button><div class="cal-popup" id="cp-alDead"></div></div><input type="hidden" id="alDead"></div>
     <input type="hidden" id="alEditId">
     <button class="btnp unlbtn" onclick="saveAlloc()">Save &amp; Allocate</button>
   </div>
@@ -334,7 +362,7 @@ textarea.fi{resize:vertical;min-height:60px;}
     <div class="r2"><div class="fg"><label class="fl">Area</label><select class="fs" id="tArea"></select></div><div class="fg"><label class="fl">Category</label><select class="fs" id="tCat"></select></div></div>
     <div class="fg"><label class="fl">Duration</label><div class="brow"><button class="xb" data-d="5" onclick="sDur('5','tD')">⚡ 5m</button><button class="xb" data-d="15" onclick="sDur('15','tD')">🕐 15m</button><button class="xb" data-d="30" onclick="sDur('30','tD')">🕑 30m</button><button class="xb" data-d="60" onclick="sDur('60','tD')">🕒 1hr</button><button class="xb" data-d="60+" onclick="sDur('60+','tD')">🕓 1hr+</button></div></div>
     <div class="fg"><label class="fl">Priority</label><div class="brow"><button class="xb" data-p="high" onclick="sPri('high','tP')">🔴 High</button><button class="xb" data-p="med" onclick="sPri('med','tP')">🟡 Medium</button><button class="xb" data-p="low" onclick="sPri('low','tP')">🟢 Low</button></div></div>
-    <div class="r2"><div class="fg"><label class="fl">Deadline</label><input class="fi" id="tDead" type="datetime-local"></div><div class="fg"><label class="fl">Reminder</label><input class="fi" id="tRem" type="datetime-local"></div></div>
+    <div class="r2"><div class="fg"><label class="fl">Deadline</label><div class="cal-wrap" id="cw-tDead"><button type="button" class="cal-trigger" onclick="toggleCal('tDead')"><span class="cal-trigger-txt" id="ctt-tDead">No deadline</span><span class="cal-trigger-ico">📅</span></button><div class="cal-popup" id="cp-tDead"></div></div><input type="hidden" id="tDead"></div><div class="fg"><label class="fl">Reminder</label><div class="cal-wrap" id="cw-tRem"><button type="button" class="cal-trigger" onclick="toggleCal('tRem')"><span class="cal-trigger-txt" id="ctt-tRem">No reminder</span><span class="cal-trigger-ico">🔔</span></button><div class="cal-popup" id="cp-tRem"></div></div><input type="hidden" id="tRem"></div></div>
     <div class="fg"><label class="fl">Add to</label><div class="brow"><button class="xb sel" data-loc="today" onclick="sLoc('today')">☀️ Today</button><button class="xb" data-loc="dump" onclick="sLoc('dump')">🧠 Brain Dump</button></div></div>
     <input type="hidden" id="tEditId">
     <button class="btnp" onclick="saveTask()">Save Task</button>
@@ -369,7 +397,7 @@ textarea.fi{resize:vertical;min-height:60px;}
     <div class="fg"><label class="fl">Priority</label><div class="brow"><button class="xb" data-pp="high" onclick="sPri('high','pP')">🔴 High</button><button class="xb" data-pp="med" onclick="sPri('med','pP')">🟡 Medium</button><button class="xb" data-pp="low" onclick="sPri('low','pP')">🟢 Low</button></div></div>
     <div class="fg"><label class="fl">Estimated Duration</label><div class="brow"><button class="xb" data-pd="5" onclick="sDur('5','pD')">⚡ 5m</button><button class="xb" data-pd="15" onclick="sDur('15','pD')">🕐 15m</button><button class="xb" data-pd="30" onclick="sDur('30','pD')">🕑 30m</button><button class="xb" data-pd="60" onclick="sDur('60','pD')">🕒 1hr</button><button class="xb" data-pd="60+" onclick="sDur('60+','pD')">🕓 1hr+</button></div></div>
     <div class="fg"><label class="fl">Icon</label><div class="epick" id="pEP"></div></div>
-    <div class="fg"><label class="fl">Deadline</label><input class="fi" id="pDead" type="date"></div>
+    <div class="fg"><label class="fl">Deadline</label><div class="cal-wrap" id="cw-pDead"><button type="button" class="cal-trigger" onclick="toggleCal('pDead')"><span class="cal-trigger-txt" id="ctt-pDead">No deadline</span><span class="cal-trigger-ico">📅</span></button><div class="cal-popup" id="cp-pDead"></div></div><input type="hidden" id="pDead"></div>
     <input type="hidden" id="pEditId">
     <button class="btnp" onclick="saveProject()">Save Project</button>
   </div>
@@ -965,6 +993,168 @@ async function aiProcess(transcript,ctx){
     else{S.editId=null;openTaskModal(transcript,'','','med','30','',isDump?'dump':'today',null);}
   }
 }
+
+// ── CALENDAR WIDGET ──────────────────────────────────────────────────────────
+var CAL_STATE={};// fieldId -> {year,month,selectedDate,selectedTime,hasTime}
+var CAL_FIELDS=['tDead','tRem','alDead','pDead'];
+var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var DAY_NAMES=['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function initCal(fieldId,hasTime){
+  var now=new Date();
+  CAL_STATE[fieldId]={year:now.getFullYear(),month:now.getMonth(),selectedDate:null,selectedTime:'09:00',hasTime:hasTime!==false};
+}
+
+function toggleCal(fieldId){
+  var popup=document.getElementById('cp-'+fieldId);
+  var trigger=popup.previousElementSibling;
+  var isOpen=popup.classList.contains('on');
+  // Close all other popups first
+  CAL_FIELDS.forEach(function(f){
+    var p=document.getElementById('cp-'+f);var t=p&&p.previousElementSibling;
+    if(p)p.classList.remove('on');if(t)t.classList.remove('open');
+  });
+  if(!isOpen){
+    if(!CAL_STATE[fieldId])initCal(fieldId);
+    renderCal(fieldId);
+    popup.classList.add('on');trigger.classList.add('open');
+  }
+}
+
+function renderCal(fieldId){
+  var st=CAL_STATE[fieldId];if(!st)return;
+  var popup=document.getElementById('cp-'+fieldId);if(!popup)return;
+  var now=new Date();var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var firstDay=new Date(st.year,st.month,1).getDay();
+  var daysInMonth=new Date(st.year,st.month+1,0).getDate();
+  var daysInPrev=new Date(st.year,st.month,0).getDate();
+
+  // Build grid cells
+  var cells='';
+  // Previous month trailing days
+  for(var i=firstDay-1;i>=0;i--){
+    cells+='<button class="cal-cell other-month" disabled>'+(daysInPrev-i)+'</button>';
+  }
+  // Current month
+  for(var d=1;d<=daysInMonth;d++){
+    var cellDate=new Date(st.year,st.month,d);
+    var isPast=cellDate<today;
+    var isTod=cellDate.getTime()===today.getTime();
+    var isSel=st.selectedDate&&cellDate.getTime()===new Date(st.selectedDate).getTime();
+    var cls='cal-cell'+(isPast?' past':'')+(isTod&&!isSel?' today':'')+(isSel?' selected':'');
+    var click=isPast?'':' onclick="selectCalDay(\''+fieldId+'\','+st.year+','+st.month+','+d+')"';
+    cells+='<button class="'+cls+'"'+click+'>'+d+'</button>';
+  }
+  // Next month leading days
+  var totalCells=Math.ceil((firstDay+daysInMonth)/7)*7;
+  for(var n=1;n<=totalCells-firstDay-daysInMonth;n++){
+    cells+='<button class="cal-cell other-month" disabled>'+n+'</button>';
+  }
+
+  var timeRow=st.hasTime?'<div class="cal-time-row"><span class="cal-time-lbl">Time</span><input class="cal-time-inp" type="time" value="'+st.selectedTime+'" onchange="setCalTime(\''+fieldId+'\',this.value)"><button class="cal-clear" onclick="clearCal(\''+fieldId+'\')">Clear</button></div>':'<div class="cal-time-row" style="justify-content:flex-end;"><button class="cal-clear" onclick="clearCal(\''+fieldId+'\')">Clear</button></div>';
+
+  popup.innerHTML='<div class="cal-header"><button class="cal-nav" onclick="calNav(\''+fieldId+'\',-1)">&#8249;</button><span class="cal-month-lbl">'+MONTH_NAMES[st.month]+' '+st.year+'</span><button class="cal-nav" onclick="calNav(\''+fieldId+'\',1)">&#8250;</button></div><div class="cal-days-hdr">'+DAY_NAMES.map(function(d){return '<div class="cal-day-hdr">'+d+'</div>';}).join('')+'</div><div class="cal-grid">'+cells+'</div>'+timeRow;
+}
+
+function calNav(fieldId,dir){
+  var st=CAL_STATE[fieldId];if(!st)return;
+  st.month+=dir;
+  if(st.month>11){st.month=0;st.year++;}
+  if(st.month<0){st.month=11;st.year--;}
+  renderCal(fieldId);
+}
+
+function selectCalDay(fieldId,year,month,day){
+  var st=CAL_STATE[fieldId];if(!st)return;
+  st.selectedDate=new Date(year,month,day);
+  st.year=year;st.month=month;
+  commitCal(fieldId);
+  renderCal(fieldId);
+}
+
+function setCalTime(fieldId,val){
+  var st=CAL_STATE[fieldId];if(!st)return;
+  st.selectedTime=val;
+  commitCal(fieldId);
+}
+
+function commitCal(fieldId){
+  var st=CAL_STATE[fieldId];if(!st||!st.selectedDate)return;
+  var d=st.selectedDate;
+  var dateStr=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  var val=st.hasTime?dateStr+'T'+st.selectedTime:dateStr;
+  document.getElementById(fieldId).value=val;
+  // Update trigger label
+  var lbl=document.getElementById('ctt-'+fieldId);
+  if(lbl){
+    var dispDate=d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+    lbl.textContent=st.hasTime?dispDate+' '+st.selectedTime:dispDate;
+  }
+}
+
+function clearCal(fieldId){
+  var st=CAL_STATE[fieldId];if(st){st.selectedDate=null;st.selectedTime='09:00';}
+  document.getElementById(fieldId).value='';
+  var lbl=document.getElementById('ctt-'+fieldId);
+  if(lbl)lbl.textContent=fieldId==='tRem'?'No reminder':'No deadline';
+  var popup=document.getElementById('cp-'+fieldId);if(popup)popup.classList.remove('on');
+  var trigger=popup&&popup.previousElementSibling;if(trigger)trigger.classList.remove('open');
+}
+
+function pad(n){return n<10?'0'+n:n;}
+
+function resetCal(fieldId,val,hasTime){
+  initCal(fieldId,hasTime);
+  var lbl=document.getElementById('ctt-'+fieldId);
+  if(!val){if(lbl)lbl.textContent=fieldId==='tRem'?'No reminder':'No deadline';document.getElementById(fieldId).value='';return;}
+  var d=new Date(val);var st=CAL_STATE[fieldId];
+  st.selectedDate=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  st.year=d.getFullYear();st.month=d.getMonth();
+  if(hasTime){var h=d.getHours(),m=d.getMinutes();st.selectedTime=pad(h)+':'+pad(m);}
+  document.getElementById(fieldId).value=val;
+  if(lbl){var disp=d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});lbl.textContent=hasTime?disp+' '+st.selectedTime:disp;}
+}
+
+// Close calendar when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.cal-wrap')){
+    CAL_FIELDS.forEach(function(f){
+      var p=document.getElementById('cp-'+f);var t=p&&p.previousElementSibling;
+      if(p)p.classList.remove('on');if(t)t.classList.remove('open');
+    });
+  }
+});
+
+// ── Patch modal openers to use resetCal ──────────────────────────────────────
+var _origOpenTaskModal=openTaskModal;
+openTaskModal=function(name,aId,cat,pri,dur,notes,loc,editId){
+  _origOpenTaskModal(name,aId,cat,pri,dur,notes,loc,editId);
+  resetCal('tDead','',true);resetCal('tRem','',true);
+};
+var _origEditTask=editTask;
+editTask=function(id){
+  _origEditTask(id);
+  var t=tasks.find(function(t){return t.id===id;});
+  if(t){resetCal('tDead',t.deadline||'',true);resetCal('tRem',t.reminder||'',true);}
+};
+var _origEditDump=editDump;
+editDump=function(id){
+  var t=dump.find(function(t){return t.id===id;});
+  if(t&&t.unallocated){openAllocModal(id);return;}
+  _origEditDump(id);
+  if(t){resetCal('tDead',t.deadline||'',true);resetCal('tRem','',true);}
+};
+var _origOpenAllocModal=openAllocModal;
+openAllocModal=function(id){
+  _origOpenAllocModal(id);
+  var t=dump.find(function(t){return t.id===id;});
+  resetCal('alDead',t&&t.deadline?t.deadline:'',true);
+};
+var _origOpenProjModal=openProjModal;
+openProjModal=function(p){
+  _origOpenProjModal(p);
+  resetCal('pDead',p&&p.deadline?p.deadline:'',false);
+};
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(function(){});
 injectRecur();restoreRem();render();
