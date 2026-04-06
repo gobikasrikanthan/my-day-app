@@ -733,7 +733,13 @@ function renderDump(){
     }
     if(recurItems.length){
       html+='<div class="subhdr">Recurring</div><div class="cl" style="margin-bottom:6px;">';
-      recurItems.forEach(function(x){var r=x.item;var fStr=fmtFreq(r);html+='<div class="ptask"><div style="font-size:.9rem;flex-shrink:0;">🔁</div><div class="tb"><div class="tn">'+r.name+'</div>'+(r.notes?'<div class="tnotes">'+r.notes+'</div>':'')+'<div class="chips"><span class="chip crc">'+fStr+'</span>'+(DL[r.duration]?'<span class="chip cdu">'+DL[r.duration]+'</span>':'')+'<span class="chip '+pClass(r.priority)+'">'+pLabel(r.priority)+'</span></div></div><div class="tas"><button class="ib" onclick="editRecur(\''+r.id+'\')">✏️</button></div></div>';});
+      recurItems.forEach(function(x){var r=x.item;var fStr=fmtFreq(r);
+        var alreadyToday=tasks.some(function(t){return t.recurId===r.id&&t.addedKey===tKey();});
+        var todayBtn=alreadyToday
+          ?'<span style="font-size:.68rem;color:var(--acc);font-weight:600;">✓ In Today</span>'
+          :'<button class="t2t" onclick="addRecurToToday(\''+r.id+'\')">→ Add to Today</button>';
+        html+='<div class="ptask"><div style="font-size:.9rem;flex-shrink:0;">🔁</div><div class="tb"><div class="tn">'+r.name+'</div>'+(r.notes?'<div class="tnotes">'+r.notes+'</div>':'')+'<div class="chips"><span class="chip crc">'+fStr+'</span>'+(DL[r.duration]?'<span class="chip cdu">'+DL[r.duration]+'</span>':'')+'<span class="chip '+pClass(r.priority)+'">'+pLabel(r.priority)+'</span></div><div style="margin-top:7px;">'+todayBtn+'</div></div><div class="tas"><button class="ib" onclick="editRecur(\''+r.id+'\')">✏️</button></div></div>';
+      });
       html+='</div>';
     }
     if(projItems.length){
@@ -855,7 +861,35 @@ function renderCalendar(){
 }
 
 // ── TASK ACTIONS ──────────────────────────────────────────────────────────────
-function togTask(id){var t=tasks.find(function(t){return t.id===id;});if(t){t.done=!t.done;sv();render();}}
+function togTask(id){
+  var t=tasks.find(function(t){return t.id===id;});
+  if(!t)return;
+  t.done=!t.done;
+  // If a manually-added recurring task (from brain dump) is completed, remove from Today
+  // It was added with addedFromDump=true flag — move it out cleanly
+  if(t.done&&t.recurId&&t.addedFromDump){
+    tasks=tasks.filter(function(x){return x.id!==id;});
+    sv();render();
+    // Brief confirmation
+    var msg=document.createElement('div');
+    msg.textContent='✓ Done! Recurring task removed from Today.';
+    msg.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2c5f4a;color:#fff;padding:10px 18px;border-radius:99px;font-size:.8rem;font-family:"DM Sans",sans-serif;z-index:9999;font-weight:600;';
+    document.body.appendChild(msg);
+    setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},2500);
+    return;
+  }
+  sv();render();
+}
+function addRecurToToday(recurId){
+  var r=recurs.find(function(r){return r.id===recurId;});if(!r)return;
+  var tk=tKey();
+  // Check not already added today
+  if(tasks.some(function(t){return t.recurId===recurId&&t.addedKey===tk;})){
+    alert('This recurring task is already in Today.');return;
+  }
+  tasks.push({id:uid(),recurId:recurId,addedKey:tk,addedFromDump:true,name:r.name,notes:r.notes||'',areaId:r.areaId,cat:r.cat||'General',priority:r.priority||'med',duration:r.duration||'30',deadline:'',reminder:'',done:false});
+  sv();render();
+}
 function delTask(id){if(!confirm('Delete?'))return;tasks=tasks.filter(function(t){return t.id!==id;});sv();render();}
 function delDump(id){if(!confirm('Delete?'))return;dump=dump.filter(function(t){return t.id!==id;});sv();render();}
 function clearToday(){if(!confirm('Clear today?'))return;tasks=[];sv();render();}
