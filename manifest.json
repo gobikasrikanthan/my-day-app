@@ -2,21 +2,21 @@
   "name": "My Day - Task Manager",
   "short_name": "My Day",
   "description": "Daily task and project manager",
-  "start_url": "/my-day-app/index.html",
-  "scope": "/my-day-app/",
+  "start_url": "https://gobikasrikanthan.github.io/my-day-app/index.html",
+  "scope": "https://gobikasrikanthan.github.io/my-day-app/",
   "display": "standalone",
   "background_color": "#f8f7f4",
   "theme_color": "#2c5f4a",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://gobikasrikanthan.github.io/my-day-app/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://gobikasrikanthan.github.io/my-day-app/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
